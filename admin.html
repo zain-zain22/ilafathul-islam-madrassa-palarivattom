@@ -85,52 +85,61 @@ const btns=(v,n)=>`<p><button class="pri" onclick="pr(window.${v})">🖨️ പ�
 const regList=()=>db.students.filter(s=>sel.all||(s.joined>=sel.from&&s.joined<=sel.to));
 const regF=()=>`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto" ${sel.all?'checked':''} onchange="sel.all=this.checked;reg()"> എല്ലാ കുട്ടികളും (തീയതി ഫിൽട്ടർ ഇല്ലാതെ)</label>${sel.all?'':rng('reg')}`;
 async function pdf(v,name,up){const html=window[v];if(!html)return alert('രജിസ്റ്റർ ലോഡ് ആയിട്ടില്ല');st('PDF തയ്യാറാക്കുന്നു…');
-const box=document.createElement('div');box.style.cssText='position:fixed;left:-20000px;top:0;width:1090px;background:#fff;color:#000;padding:6px';box.innerHTML=html;
+const box=document.createElement('div');box.style.cssText='position:fixed;left:-20000px;top:0;width:'+(v=='_tc'?740:1090)+'px;background:#fff;color:#000;padding:6px';box.innerHTML=html;
 box.querySelectorAll('table').forEach(t=>{t.style.width='100%';t.style.tableLayout='fixed';t.style.fontSize='9px'});document.body.appendChild(box);
-try{const w=html2pdf().set({margin:5,filename:name+'-'+today+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'}}).from(box);
-if(up){const d=await w.outputPdf('datauristring');await api('uploadPdf',{pin:PIN,name:name+'-'+sel.from+'_'+sel.to+'.pdf',b64:d.split(',')[1]});st('✓ Drive-ലേക്ക് അപ്‌ലോഡ് ചെയ്തു');alert('Drive › Madrasa_Backups › Reports ഫോൾഡറിൽ സേവ് ചെയ്തു')}
+try{const w=html2pdf().set({margin:5,filename:name+'-'+today+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:v=='_tc'?'portrait':'landscape'}}).from(box);
+if(up){const d=await w.outputPdf('datauristring');await api('uploadPdf',{pin:PIN,name:name+(v=='_tc'?'-'+today:'-'+sel.from+'_'+sel.to)+'.pdf',b64:d.split(',')[1]});st('✓ Drive-ലേക്ക് അപ്‌ലോഡ് ചെയ്തു');alert('Drive › Madrasa_Backups › Reports ഫോൾഡറിൽ സേവ് ചെയ്തു')}
 else{await w.save();st('✓ PDF ഡൗൺലോഡ് ചെയ്തു')}}catch(e){st('⚠ PDF പരാജയം');alert('PDF പരാജയം: '+e.message)}finally{box.remove()}}
 /* അഡ്മിൻ */
+const clsOn=(s,d)=>{const h=s.hist;if(!h||!h.length)return s.classId;let c=h[0].c;for(const e of h)if(e.from<=d)c=e.c;return c};
+const inC=(s,c,a,b)=>clsOn(s,a)==c||clsOn(s,b)==c||(s.hist||[]).some(e=>e.c==c&&e.from>=a&&e.from<=b);
 let sub={st:'apps',te:'mreg'};
 function admin_(){const T=[['dash','🏠 ഡാഷ്ബോർഡ്'],['st','👦 വിദ്യാർത്ഥികൾ'],['te','👳 അധ്യാപകർ'],['set','⚙️ ക്രമീകരണം']];
-const S={st:[['apps','അപേക്ഷകൾ ('+db.apps.length+')'],['stu','കുട്ടികൾ'],['reg','അഡ്മിഷൻ രജിസ്റ്റർ'],['attp','അറ്റൻഡൻസ് രജിസ്റ്റർ']],te:[['mreg','മുഅല്ലിം രജിസ്റ്റർ'],['sig','സിഗ്നേച്ചർ രജിസ്റ്റർ']]};
+const S={st:[['apps','അപേക്ഷകൾ ('+db.apps.length+')'],['stu','കുട്ടികൾ'],['reg','അഡ്മിഷൻ രജിസ്റ്റർ'],['attp','അറ്റൻഡൻസ് രജിസ്റ്റർ'],['promo','പ്രൊമോഷൻ']],te:[['mreg','മുഅല്ലിം രജിസ്റ്റർ'],['sig','സിഗ്നേച്ചർ രജിസ്റ്റർ']]};
 $('#app').innerHTML='<p><button class="sm" onclick="reload()">🔄 പുതുക്കുക</button> <button class="sm" onclick="logout()">🔒 പുറത്തുകടക്കുക</button></p>'+tabs(T)+(S[tab]?'<div class="tabs">'+S[tab].map(([k,v])=>`<button class="sm ${sub[tab]==k?'on':''}" onclick="sub['${tab}']='${k}';go()">${v}</button>`).join('')+'</div>':'')+'<div id="pg"></div>';
-({dash,apps,stu,reg,attp,mreg,sig,set})[S[tab]?sub[tab]:tab]()}
+({dash,apps,stu,reg,attp,promo,mreg,sig,set})[S[tab]?sub[tab]:tab]()}
 function dash(){const t=today,pend=db.classes.map(c=>({c,p:pending(c.id)})).filter(x=>x.p.length);
+const lng=[];db.classes.forEach(c=>{const ks=Object.keys(db.att).filter(k=>k.startsWith(c.id+'|')&&!db.att[k].holiday).map(k=>k.split('|')[1]).sort().slice(-10);if(ks.length<10)return;stuIn(c.id).forEach(s=>{if(s.joined<=ks[0]&&ks.every(d=>db.att[c.id+'|'+d].absent.includes(s.no)))lng.push(s.no+'. '+s.name+' ('+c.name+')')})});
+const lngH=lng.length?'<h2>10 പ്രവൃത്തി ദിവസമായി വരാത്തവർ</h2><div class="card">'+lng.map(x=>'<div class="row">'+x+'</div>').join('')+'<p class="mu">വിടുതൽ ചെയ്യേണ്ടതുണ്ടോ എന്ന് നോക്കുക (കുട്ടികൾ ടാബ്).</p></div>':'';
 const rows=db.classes.map(c=>{const a=db.att[c.id+'|'+t],n=stuIn(c.id).length;return`<div class="row"><span>${c.name} · ${cls(c.id).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>${a?a.holiday?'അവധി: '+a.holiday:(n-a.absent.length)+' / '+n+' ഹാജർ':'<i class="mu">ഇന്ന് ബാക്കി</i>'}</span></div>`}).join('');
-$('#pg').innerHTML=`<div class="stat"><div><b>${db.students.filter(s=>!s.left).length}</b>ആകെ കുട്ടികൾ</div><div><b>${db.apps.length}</b>പുതിയ അപേക്ഷ</div><div><b>${pend.length}</b>ഹാജർ ബാക്കിയുള്ള ക്ലാസ്</div></div><h2>ഇന്ന് (${t})</h2><div class="card">${rows||'ക്ലാസുകളില്ല'}</div>${pend.map(x=>`<p class="warn">${x.c.name}: ${x.p.length} ദിവസം ബാക്കി</p>`).join('')}`}
+$('#pg').innerHTML=`<div class="stat"><div><b>${db.students.filter(s=>!s.left).length}</b>ആകെ കുട്ടികൾ</div><div><b>${db.apps.length}</b>പുതിയ അപേക്ഷ</div><div><b>${pend.length}</b>ഹാജർ ബാക്കിയുള്ള ക്ലാസ്</div></div><h2>ഇന്ന് (${t})</h2><div class="card">${rows||'ക്ലാസുകളില്ല'}</div>${lngH}${pend.map(x=>`<p class="warn">${x.c.name}: ${x.p.length} ദിവസം ബാക്കി</p>`).join('')}`}
 function apps(){$('#pg').innerHTML=db.apps.length?db.apps.map(a=>`<div class="card"><b>${a.name}</b> (${a.gender}) · ${a.dob}<div class="mu">${a.guardian} · ${a.phone} · ${cls(a.classId).name} · അപേക്ഷ: ${a.date}</div>
-<label>ചേർന്ന തീയതി<input type="date" id="j${a.id}" value="${a.date}"></label><label>പ്രവേശന നമ്പർ<input type="number" id="n${a.id}" value="${db.next}"></label>
+<label>ചേർന്ന തീയതി<input type="date" id="j${a.id}" value="${a.date}"></label><label>ക്ലാസ്<select id="k${a.id}">${opts(db.classes,a.classId)}</select></label><label>പ്രവേശന നമ്പർ<input type="number" id="n${a.id}" value="${db.next}"></label>
 <p><button class="pri sm" onclick="approve(${a.id})">അംഗീകരിക്കുക</button> <button class="sm" onclick="rej(${a.id})">നിരസിക്കുക</button></p></div>`).join(''):'<p class="mu">പുതിയ അപേക്ഷകളില്ല.</p>'}
-function approve(id){const a=db.apps.find(x=>x.id==id),no=+$('#n'+id).value;if(db.students.some(s=>s.no==no))return alert('ഈ പ്രവേശന നമ്പർ ഉപയോഗത്തിലുണ്ട്');
-db.students.push({...a,no,joined:$('#j'+id).value});db.next=Math.max(db.next,no+1);db.apps=db.apps.filter(x=>x.id!=id);delApp(id);save();admin_()}
+function approve(id){if(!db.classes.length)return alert('ആദ്യം ക്ലാസ് ഉണ്ടാക്കുക');const a=db.apps.find(x=>x.id==id),no=+$('#n'+id).value;if(db.students.some(s=>s.no==no))return alert('ഈ പ്രവേശന നമ്പർ ഉപയോഗത്തിലുണ്ട്');
+db.students.push({...a,no,joined:$('#j'+id).value,classId:$('#k'+id).value});db.next=Math.max(db.next,no+1);db.apps=db.apps.filter(x=>x.id!=id);delApp(id);save();admin_()}
 function rej(id){if(confirm('നിരസിക്കട്ടെ?')){db.apps=db.apps.filter(x=>x.id!=id);delApp(id);save();admin_()}}
-function stu(){$('#pg').innerHTML=`<div class="card"><b>കുട്ടിയെ ചേർക്കുക (പഴയ കുട്ടികൾക്കും)</b><div class="g">${f('s_no','പ്രവേശന നമ്പർ','number',db.next)}${f('s_j','ചേർന്ന തീയതി','date',today)}</div>${f('s_name','പേരും ഇനീഷ്യലും')}<div class="g">${f('s_house','വീട്ടുപേര്')}${f('s_dob','ജനന തീയതി','date')}</div>${f('s_p','പിതാവ്/മാതാവ്')}${f('s_gu','രക്ഷിതാവ്')}<div class="g">${f('s_ph','ഫോൺ','tel')}${f('s_rel','ബന്ധം')}</div>${f('s_job','ജോലി, മേൽവിലാസം')}${f('s_mark','തിരിച്ചറിയാനുള്ള അടയാളം')}${f('s_prev','മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി')}${f('s_pn','മുൻ നമ്പർ')}<label>ക്ലാസ്<select id="s_cls">${opts(db.classes)}</select></label><p><button class="pri" onclick="addStu()">ചേർക്കുക</button></p></div>
-<h2>ലിസ്റ്റ്</h2>${db.students.sort((a,b)=>a.no-b.no).map(s=>`<div class="row"><span>${s.no}. ${s.name} <span class="mu">${cls(s.classId).name}${s.left?' · വിട്ടു '+s.left.date:''}</span></span>${s.left?'':`<button class="sm" onclick="leave(${s.no})">വിടുതൽ</button>`}</div>`).join('')||'<p class="mu">കുട്ടികളില്ല.</p>'}`}
-function addStu(){const no=+val('s_no');if(!val('s_name')||!no)return alert('പേരും നമ്പറും വേണം');if(db.students.some(s=>s.no==no))return alert('നമ്പർ ഉപയോഗത്തിലുണ്ട്');
+function stu(){$('#pg').innerHTML=`<div class="card"><b>കുട്ടിയെ ചേർക്കുക (പഴയ കുട്ടികൾക്കും)</b><div class="g">${f('s_no','പ്രവേശന നമ്പർ','number',db.next)}${f('s_j','ചേർന്ന തീയതി','date',today)}</div>${f('s_name','പേരും ഇനീഷ്യലും')}<div class="g">${f('s_house','വീട്ടുപേര്')}${f('s_dob','ജനന തീയതി','date')}</div>${f('s_p','പിതാവ്/മാതാവ്')}${f('s_gu','രക്ഷിതാവ്')}<div class="g">${f('s_ph','ഫോൺ','tel')}${f('s_rel','ബന്ധം')}</div>${f('s_job','ജോലി, മേൽവിലാസം')}${f('s_mark','തിരിച്ചറിയാനുള്ള അടയാളം')}${f('s_prev','മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി')}${f('s_pn','മുൻ നമ്പർ')}${db.classes.length?'':'<p class="warn">ആദ്യം ക്രമീകരണത്തിൽ ക്ലാസ് ഉണ്ടാക്കുക.</p>'}<label>ക്ലാസ്<select id="s_cls">${opts(db.classes)}</select></label><p><button class="pri" onclick="addStu()">ചേർക്കുക</button></p></div>
+<h2>ലിസ്റ്റ്</h2>${db.students.sort((a,b)=>a.no-b.no).map(s=>`<div class="row" style="${s.left?'opacity:.55':''}"><span>${s.no}. ${s.name} <span class="mu">${cls(s.classId).name}${s.left?' · '+(s.left.how||'വിട്ടു')+' '+s.left.date:''}</span></span>${s.left?`<button class="sm" onclick="readmit(${s.no})">↩ തിരികെ ചേർക്കുക</button> <button class="sm" onclick="tcForm(${s.no})">📄 TC</button>`:`<button class="sm" onclick="leave(${s.no})">വിടുതൽ</button>`}</div>`).join('')||'<p class="mu">കുട്ടികളില്ല.</p>'}`}
+function addStu(){if(!db.classes.length)return alert('ആദ്യം ക്രമീകരണത്തിൽ ക്ലാസ് ഉണ്ടാക്കുക');const no=+val('s_no');if(!val('s_name')||!no)return alert('പേരും നമ്പറും വേണം');if(db.students.some(s=>s.no==no))return alert('നമ്പർ ഉപയോഗത്തിലുണ്ട്');
 db.students.push({no,joined:val('s_j'),name:val('s_name'),house:val('s_house'),dob:val('s_dob'),parent:val('s_p'),prev:val('s_prev'),prevNo:val('s_pn'),guardian:val('s_gu'),phone:val('s_ph'),rel:val('s_rel'),job:val('s_job'),mark:val('s_mark'),classId:$('#s_cls').value});db.next=Math.max(db.next,no+1);save();stu()}
-function leave(no){const r=prompt('വിടാനുള്ള കാരണം?');if(r===null)return;const s=db.students.find(x=>x.no==no);s.left={date:today,cls:cls(s.classId).name,reason:r,tc:prompt('കൊടുത്ത TC നമ്പർ (ഇല്ലെങ്കിൽ ഒഴിവാക്കുക)')||'',to:prompt('ചേരുന്ന മദ്രസ (ഇല്ലെങ്കിൽ ഒഴിവാക്കുക)')||''};save();stu()}
+function leave(no){const s=db.students.find(x=>x.no==no);
+const h=(prompt('വിടുതൽ രീതി (നമ്പർ നൽകുക):\n1 = TC വാങ്ങി പോയി\n2 = TC വാങ്ങാതെ നിർത്തി\n3 = പഠനം പൂർത്തിയാക്കി')||'').trim();if(!h)return;
+const how={1:'TC വാങ്ങി',2:'TC വാങ്ങാതെ നിർത്തി',3:'പഠനം പൂർത്തിയാക്കി'}[h];if(!how)return alert('1, 2, 3 എന്നിവയിൽ ഒന്ന് നൽകുക');
+const d=prompt('വിട്ട തീയതി (YYYY-MM-DD). TC ഇല്ലാതെ നിർത്തിയവർക്ക് അവസാനം ഹാജരായ തീയതി നൽകാം',today);if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d))return alert('തീയതി ശരിയല്ല');
+const r=prompt('കാരണം (ഇല്ലെങ്കിൽ ഒഴിവാക്കുക)')||'';
+s.left={date:d,cls:cls(s.classId).name,reason:r,how,tc:h=='1'?(prompt('TC നമ്പർ')||''):'',to:h=='1'?(prompt('ചേരുന്ന മദ്രസ (ഇല്ലെങ്കിൽ ഒഴിവാക്കുക)')||''):''};save();h=='1'?tcForm(no):stu()}
 
 /* പ്രിൻ്റ് */
 const PH={l:'font-weight:600'};
 function pr(html){$('#print').innerHTML=html;window.print()}
 function reg(){const H=['പ്രവേശന നമ്പർ','പേര്, ഇനീഷ്യൽ','വീട്ടുപേര്','പിതാവ്/മാതാവ്','രക്ഷിതാവ്, ഫോൺ','ബന്ധം','ജോലി, മേൽവിലാസം','ജനന തീയതി','ചേർന്ന ക്ലാസ്','ചേർന്ന തീയതി','അടയാളം','മുമ്പ് പഠിച്ച മദ്രസ/TC','മുൻ നമ്പർ','വിട്ട ക്ലാസ്','വിട്ട തീയതി','വിടാനുള്ള കാരണം','ചേരുന്ന മദ്രസ','കൊടുത്ത TC','സദറിൻ്റെ ഒപ്പ്','റിമാർക്സ്'];
-const rows=regList().sort((a,b)=>a.no-b.no).map(s=>[s.no,s.name,s.house,s.parent||'',(s.guardian||'')+' '+(s.phone||''),s.rel,s.job,s.dob,cls(s.classId).name,s.joined,s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',s.left?.date||'',s.left?.reason||'',s.left?.to||'',s.left?.tc||'','','']);
-const tbl=`<h3>വിദ്യാർത്ഥി പ്രവേശന രജിസ്റ്റർ ${db.madrasa?'– '+db.madrasa:''}</h3><table style="width:100%;font-size:9px"><tr>${H.map((h,i)=>`<th>${h}<br>${i+1}</th>`).join('')}</tr>${rows.map(r=>`<tr style="height:34px">${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</table>`;
+const L=regList().sort((a,b)=>a.no-b.no);const rows=L.map(s=>[s.no,s.name,s.house,s.parent||'',(s.guardian||'')+' '+(s.phone||''),s.rel,s.job,s.dob,cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,s.joined,s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',s.left?.date||'',s.left?.reason||'',s.left?.to||'',s.left?.tc||'','',s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):'']);
+const tbl=`<h3>വിദ്യാർത്ഥി പ്രവേശന രജിസ്റ്റർ ${db.madrasa?'– '+db.madrasa:''}</h3><table style="width:100%;font-size:9px"><tr>${H.map((h,i)=>`<th>${h}<br>${i+1}</th>`).join('')}</tr>${rows.map((r,ri)=>`<tr style="height:34px;${L[ri].left?'opacity:.5;background:#eee':''}">${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</table>`;
 window._reg=tbl;$('#pg').innerHTML=`<p class="mu">20 കള്ളികളുടെ ക്രമത്തിൽ. ഹിജ്രി തീയതി ഈ മാതൃകയിൽ ഇല്ല.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl.replace('style="width:100%;font-size:9px"','')}</div>`}
 function dim(m){const[y,mo]=m.split('-').map(Number);return new Date(y,mo,0).getDate()}
 function attp(){const c=sel.cls,ms=sel.from,me=sel.to,days=rangeDays(ms,me),n=days.length,m=ms.slice(0,7),y=ms.slice(0,4);if(!n||n>31||!c){$('#pg').innerHTML=rng('attp')+'<p class="warn">1–31 ദിവസത്തെ തീയതി പരിധി തിരഞ്ഞെടുക്കുക.</p>';return}
 const sun=d=>new Date(d+'T00:00').getDay()==0,rec=d=>db.att[c+'|'+d];
-const st=db.students.filter(s=>s.classId==c&&s.joined<=me&&(!s.left||s.left.date>=ms)).sort((a,b)=>a.no-b.no);
+const st=db.students.filter(s=>inC(s,c,ms,me)&&s.joined<=me&&(!s.left||s.left.date>=ms)).sort((a,b)=>a.no-b.no);
 const keys=Object.keys(db.att).filter(k=>k.startsWith(c+'|')).map(k=>k.split('|')[1]).filter(d=>d.slice(0,4)==y&&!db.att[c+'|'+d].holiday);
 const wM=keys.filter(d=>d>=ms&&d<=me).length,wP=keys.filter(d=>d<ms).length,wT=wM+wP;
-const pres=(s,fn)=>keys.filter(d=>fn(d)&&s.joined<=d&&!db.att[c+'|'+d].absent.includes(s.no)).length;
+const pres=(s,fn)=>keys.filter(d=>fn(d)&&s.joined<=d&&clsOn(s,d)==c&&!db.att[c+'|'+d].absent.includes(s.no)).length;
 const pm=st.map(s=>pres(s,d=>d>=ms&&d<=me)),pp=st.map(s=>pres(s,d=>d<ms)),sum=a=>a.reduce((x,y)=>x+y,0),PM=sum(pm),PP=sum(pp),PT=PM+PP;
 const avg=(p,w)=>w?(p/w).toFixed(1):'-';
-const op=db.students.filter(s=>s.classId==c&&s.joined<ms&&(!s.left||s.left.date>=ms)).length,nw=db.students.filter(s=>s.classId==c&&s.joined>=ms&&s.joined<=me).length,lf=db.students.filter(s=>s.classId==c&&s.left&&s.left.date>=ms&&s.left.date<=me).length;
+const op=db.students.filter(s=>clsOn(s,ms)==c&&s.joined<ms&&(!s.left||s.left.date>=ms)).length,nw=db.students.filter(s=>clsOn(s,me)==c&&s.joined>=ms&&s.joined<=me).length,lf=db.students.filter(s=>s.classId==c&&s.left&&s.left.date>=ms&&s.left.date<=me).length;
 const N=n+6;
-const body=st.map((s,i)=>`<tr><td>${s.no}</td><td style="text-align:left;white-space:nowrap">${s.name}</td>${days.map(d=>{const a=rec(d);return`<td style="${sun(d)||a?.holiday?'background:#ddd':''}">${sun(d)||!a||a.holiday||s.joined>d?'':a.absent.includes(s.no)?'A':'×'}</td>`}).join('')}<td>${pm[i]}</td><td>${pp[i]}</td><td>${pm[i]+pp[i]}</td><td></td></tr>`).join('');
-const tot=days.map(d=>{const a=rec(d);return`<td>${a&&!a.holiday?st.filter(s=>s.joined<=d).length-a.absent.length:''}</td>`}).join('');
+const body=st.map((s,i)=>`<tr><td>${s.no}</td><td style="text-align:left;white-space:nowrap">${s.name}</td>${days.map(d=>{const a=rec(d);return`<td style="${sun(d)||a?.holiday?'background:#ddd':''}">${sun(d)||!a||a.holiday||s.joined>d||clsOn(s,d)!=c?'':a.absent.includes(s.no)?'A':'×'}</td>`}).join('')}<td>${pm[i]}</td><td>${pp[i]}</td><td>${pm[i]+pp[i]}</td><td></td></tr>`).join('');
+const tot=days.map(d=>{const a=rec(d);return`<td>${a&&!a.holiday?st.filter(s=>s.joined<=d&&clsOn(s,d)==c).length-a.absent.length:''}</td>`}).join('');
 const sg=days.map(d=>{const a=rec(d);return`<td style="height:26px;font-size:8px">${sgn(a)}</td>`}).join('');
 const tbl=`<table style="width:100%"><colgroup><col style="width:4.5%"><col style="width:16%">${days.map(()=>'<col>').join('')}<col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:6%"></colgroup><thead><tr><td colspan="${N}" style="text-align:center;border:none"><b style="font-size:15px">ഇസ്ലാമിക് എഡ്യൂക്കേഷൻ ബോർഡ്</b><br>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്<br><b>സ്റ്റുഡൻ്റ്സ് അറ്റൻഡൻസ് രജിസ്റ്റർ</b><div style="display:flex;justify-content:space-between;margin-top:6px"><span>മദ്രസ: ${db.madrasa||'.........'}</span><span>നമ്പർ: ${db.mno||'.........'}</span><span>ക്ലാസ്: ${cls(c).name}</span><span>${cls(c).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>മാസം: ${lbl(ms,me)}</span><span>വർഷം: ${y}</span></div></td></tr><tr><th>നമ്പർ</th><th>പേര്</th>${days.map(d=>`<th>${+d.slice(8)}</th>`).join('')}<th>ഈ മാസം</th><th>മുൻ മാസം</th><th>ആകെ</th><th>റിമാർക്സ്</th></tr></thead><tbody>${body}<tr><td colspan="2">ആകെ ഹാജർ</td>${tot}<td>${wM}</td><td>${wP}</td><td>${wT}</td><td style="font-size:8px">പ്രവൃത്തി ദിവസം</td></tr><tr><td colspan="2">മുഅല്ലിമിൻ്റെ ഒപ്പ്</td>${sg}<td>${avg(PM,wM)}</td><td>${avg(PP,wP)}</td><td>${avg(PT,wT)}</td><td style="font-size:8px">ശരാശരി</td></tr></tbody><tfoot><tr><td colspan="${N}" style="text-align:left;border:none;padding-top:6px"><div style="margin-bottom:4px">മാസാരംഭത്തിൽ കുട്ടികൾ: <b>${op}</b> &nbsp;|&nbsp; പുതുതായി ചേർന്നവർ: <b>${nw}</b> &nbsp;|&nbsp; ഈ മാസം വിട്ടവർ: <b>${lf}</b> &nbsp;|&nbsp; മാസാവസാനത്തിൽ: <b>${op+nw-lf}</b></div><div style="display:none"><table style="width:100%"><tr><td></td><td>ഈ മാസം</td><td>മുൻ മാസം</td><td>ആകെ</td><td style="border:none;width:4px"></td><td>കുട്ടികളുടെ എണ്ണം</td><td></td></tr><tr><td>പ്രവൃത്തി ദിവസം</td><td>${wM}</td><td>${wP}</td><td>${wT}</td><td style="border:none"></td><td>മാസാരംഭത്തിൽ</td><td>${op}</td></tr><tr><td>ആകെ ഹാജർ</td><td>${PM}</td><td>${PP}</td><td>${PT}</td><td style="border:none"></td><td>പുതിയതായി ചേർന്നവർ</td><td>${nw}</td></tr><tr><td>ശരാശരി ഹാജർ</td><td>${avg(PM,wM)}</td><td>${avg(PP,wP)}</td><td>${avg(PT,wT)}</td><td style="border:none"></td><td>ഈ മാസം വിട്ടവർ</td><td>${lf}</td></tr><tr><td colspan="4" style="border:none"></td><td style="border:none"></td><td>മാസാവസാനത്തിൽ</td><td>${op+nw-lf}</td></tr></table></div><div style="display:flex;justify-content:space-between;margin-top:14px;font-size:11px"><span>ക്ലാസ് മുഅല്ലിം: ................</span><span>സദർ മുഅല്ലിം: ................</span><span>മുഫത്തീശ്: ................</span></div></td></tr></tfoot></table>`;
 window._att=tbl;$('#pg').innerHTML=`<div class="g"><label>ക്ലാസ്<select onchange="sel.cls=this.value;attp()">${opts(db.classes,c)}</select></label></div>${rng('attp')}<div></div><p class="mu">മദ്രസയുടെ പേരും നമ്പറും ക്രമീകരണത്തിൽ നൽകുക.</p>${btns('_att','attendance-register')}<div class="scroll card">${tbl}</div>`}
@@ -159,11 +168,82 @@ window._sg=tbl;$('#pg').innerHTML=`${rng('sig')}<p class="mu">ഓരോ ദി�
 function set(){$('#pg').innerHTML=`<div class="card"><b>മദ്രസ</b>${f('m_name','മദ്രസയുടെ പേര്','text',db.madrasa)}${f('m_no','മദ്രസയുടെ രജിസ്റ്റർ നമ്പർ','text',db.mno||'')}${f('m_next','അടുത്ത പ്രവേശന നമ്പർ','number',db.next)}<p><button onclick="db.madrasa=val('m_name');db.mno=val('m_no');db.next=+val('m_next');save();alert('സേവ് ചെയ്തു')">സേവ്</button></p></div>
 <div class="card"><b>ക്ലാസുകൾ</b>${db.classes.map(c=>`<div class="row"><span>${c.name} · സെക്ഷൻ ${c.sess} · ${db.teachers.find(t=>t.id==c.teacher)?.name||'-'}</span><button class="sm" onclick="delC('${c.id}')">നീക്കുക</button></div>`).join('')}
 ${f('c_name','പുതിയ ക്ലാസിൻ്റെ പേര്')}<div class="g"><label>സെക്ഷൻ<select id="c_s"><option>1</option><option>2</option></select></label><label>ക്ലാസ് അധ്യാപകൻ<select id="c_t">${opts(db.teachers)}</select></label></div><button onclick="addC()">ക്ലാസ് ചേർക്കുക</button></div>
-<div class="card"><b>അധ്യാപകർ</b>${db.teachers.map(t=>`<div class="row"><span>${t.name}</span></div>`).join('')}${f('t_name','പുതിയ അധ്യാപകൻ്റെ പേര്')}<button onclick="addT()">ചേർക്കുക</button></div>
 <div class="card"><b>ബാക്കപ്പ്</b><p><button class="pri" onclick="driveBk()">☁ Google Drive-ലേക്ക് ബാക്കപ്പ്</button></p><p><button onclick="bk()">ബാക്കപ്പ് ഫോണിലേക്ക് ഡൗൺലോഡ്</button></p><p><button class="sm" onclick="chPin()">അഡ്മിൻ PIN മാറ്റുക</button></p><label>റീസ്റ്റോർ (ബാക്കപ്പ് ഫയൽ)<input type="file" accept=".json" onchange="rs(this.files[0])"></label></div>`}
 function addC(){if(!val('c_name'))return;db.classes.push({id:'c'+Date.now(),name:val('c_name'),sess:$('#c_s').value,teacher:$('#c_t').value});save();set()}
-function delC(id){if(confirm('ക്ലാസ് നീക്കട്ടെ?')){db.classes=db.classes.filter(c=>c.id!=id);save();set()}}
-function addT(){if(!val('t_name'))return;db.teachers.push({id:'t'+Date.now(),name:val('t_name')});save();set()}
+
+function promo(){const c=db.classes.find(x=>x.id==sel.pc)?sel.pc:db.classes[0]?.id;sel.pc=c;
+if(!c){$('#pg').innerHTML='<p class="warn">ക്ലാസുകളില്ല.</p>';return}
+const i=db.classes.findIndex(x=>x.id==c),nx=sel.pt&&sel.pt!=c?sel.pt:(db.classes[i+1]?.id||''),L=stuIn(c);
+$('#pg').innerHTML=`<div class="card"><b>പ്രൊമോഷൻ / ക്ലാസ് മാറ്റം</b><div class="g"><label>ഇപ്പോഴത്തെ ക്ലാസ്<select onchange="sel.pc=this.value;sel.pt='';promo()">${opts(db.classes,c)}</select></label><label>പുതിയ ക്ലാസ്<select id="pt" onchange="sel.pt=this.value">${opts(db.classes.filter(x=>x.id!=c),nx)}</select></label></div>${f('pd','മാറ്റം പ്രാബല്യത്തിൽ വരുന്ന തീയതി','date',today)}
+${L.map(s=>`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" class="pk" value="${s.no}" checked style="width:auto"> ${s.no}. ${s.name}</label>`).join('')||'<p class="mu">ഈ ക്ലാസിൽ കുട്ടികളില്ല.</p>'}
+<p class="mu">ടിക്ക് ഒഴിവാക്കിയവർ ഇപ്പോഴത്തെ ക്ലാസിൽ തന്നെ തുടരും. പ്രവേശന നമ്പർ മാറില്ല. പഴയ മാസങ്ങളിലെ രജിസ്റ്ററിൽ കുട്ടി പഴയ ക്ലാസിൽ തന്നെ കാണും.</p><p><button class="pri" onclick="doPromo('${c}')">തിരഞ്ഞെടുത്തവരെ മാറ്റുക</button></p></div>`}
+function doPromo(c){const t=($('#pt')||{}).value,d=val('pd'),ks=[...document.querySelectorAll('.pk')].filter(x=>x.checked).map(x=>+x.value);
+if(!t)return alert('പുതിയ ക്ലാസ് തിരഞ്ഞെടുക്കുക');if(!d)return alert('തീയതി നൽകുക');if(!ks.length)return alert('ആരെയും തിരഞ്ഞെടുത്തിട്ടില്ല');
+if(!confirm(ks.length+' കുട്ടികളെ '+cls(c).name+' ൽ നിന്ന് '+cls(t).name+' ലേക്ക് മാറ്റട്ടെ?'))return;
+db.students.filter(s=>ks.includes(+s.no)).forEach(s=>{s.hist=s.hist&&s.hist.length?s.hist:[{c:s.classId,from:s.joined}];s.hist.push({c:t,from:d});s.classId=t});
+save();sel.pt='';promo();alert('മാറ്റി')}
+function readmit(no){const s=db.students.find(x=>x.no==no);if(!s||!confirm(s.name+' നെ പഴയ നമ്പറിൽ തന്നെ വീണ്ടും ചേർക്കട്ടെ?'))return;(s.leftHist=s.leftHist||[]).push(s.left);delete s.left;if(!db.classes.find(c=>c.id==s.classId)&&db.classes[0])s.classId=db.classes[0].id;save();stu()}
+
+const D=d=>d?String(d).split('-').reverse().join('-'):'';
+const MEN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const ORD=['','First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth','Eleventh','Twelfth','Thirteenth','Fourteenth','Fifteenth','Sixteenth','Seventeenth','Eighteenth','Nineteenth','Twentieth','Twenty First','Twenty Second','Twenty Third','Twenty Fourth','Twenty Fifth','Twenty Sixth','Twenty Seventh','Twenty Eighth','Twenty Ninth','Thirtieth','Thirty First'];
+const ONES=['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'],TENS=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+const numW=n=>n<20?ONES[n]:n<100?TENS[n/10|0]+(n%10?' '+ONES[n%10]:''):n<1000?ONES[n/100|0]+' Hundred'+(n%100?' '+numW(n%100):''):numW(n/1000|0)+' Thousand'+(n%1000?' '+numW(n%1000):'');
+const dobW=d=>{if(!d)return'';const[y,m,dd]=d.split('-').map(Number);return ORD[dd]+' '+MEN[m-1]+' '+numW(y)};
+function tcNext(yr){return Math.max(0,...db.students.map(s=>{const t=(s.tc&&s.tc.no)||(s.left&&s.left.tc)||'',m=/^(\d+)\/(\d{4})$/.exec(t);return m&&m[2]==yr?+m[1]:0}))+1}
+function wd(s,a,b){let w=0,p=0,last='';Object.keys(db.att).sort().forEach(k=>{const[c,d]=k.split('|'),r=db.att[k];if(d<a||d>b||r.holiday||d<s.joined||clsOn(s,d)!=c)return;w++;if(!(r.absent||[]).includes(s.no)){p++;last=d}});return{w,p,last}}
+const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function tcForm(no){const s=db.students.find(x=>x.no==no),L=s.left||{},T=s.tc||{},iss=T.issue||today,yr=iss.slice(0,4);
+const ys=T.ys||(L.date||today).slice(0,4)+'-01-01',w=wd(s,ys,L.date||today),prom=(s.hist&&s.hist.length)?s.hist[s.hist.length-1].from:s.joined;
+const mk=(s.mark||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean),v=(k,d)=>T[k]!=null?T[k]:d;
+const F=[['adm','പ്രവേശന നമ്പറും തീയതിയും',s.no+', '+D(s.joined)],['mad','മദ്റസയുടെ പേരും അംഗീകാര നമ്പറും',(db.madrasa||'')+(db.mno?', '+db.mno:'')],['name','വിദ്യാർത്ഥിയുടെ പേരും ഇനീഷ്യലും',s.name],['father','പിതാവിൻ്റെ പേര്',s.parent||''],['guard','രക്ഷിതാവിൻ്റെ പേര്, ജോലി, മേൽവിലാസം',[s.guardian,s.job].filter(Boolean).join(', ')],['dobF','ജനന തീയതി (അക്കത്തിൽ)',D(s.dob)],['dobW','ജനന തീയതി (അക്ഷരത്തിൽ)',dobW(s.dob)],['std','വിടുമ്പോൾ പഠിച്ച ക്ലാസ്',L.cls||cls(s.classId).name],['admStd','ആ ക്ലാസിലേക്ക് പ്രവേശനം ലഭിച്ച തീയതി',D(prom)],['qual','കയറ്റത്തിന് അർഹതയുണ്ടോ?',''],['lastAtt','ഹാജരായ അവസാന തീയതി',D(w.last||L.date)],['removed','രജിസ്റ്ററിൽ നിന്ന് നീക്കിയ തീയതി',D(L.date||today)],['app','സർട്ടിഫിക്കറ്റിന് അപേക്ഷിച്ച തീയതി',D(today)],['reason','വിടാനുള്ള കാരണം',L.reason||''],['to','ചേരാനുദ്ദേശിക്കുന്ന മദ്റസയുടെ പേരും സ്ഥലവും അംഗീകാര നമ്പറും',L.to||''],['w15','വിടുന്ന തീയതി വരെയുള്ള പ്രവൃത്തി ദിവസങ്ങൾ',w.w],['w16','ഹാജരായ ദിവസങ്ങൾ (ഈ വർഷം)',w.p],['conduct','സ്വഭാവം',T.conduct||'നല്ലത്'],['m1','അടയാളം 1',mk[0]||''],['m2','അടയാളം 2',mk[1]||'']];
+window._tcF=F.map(x=>x[0]);
+$('#pg').innerHTML=`<p><button class="sm" onclick="stu()">‹ തിരികെ</button></p><div class="card"><b>TC – ${s.no}. ${esc(s.name)}</b><p class="mu">വിവരങ്ങൾ സ്വയം നിറച്ചിട്ടുണ്ട്. പ്രിൻ്റ് ചെയ്യുന്നതിന് മുമ്പ് തിരുത്താം.</p>
+<div class="g">${f('tc_no','TC നമ്പർ','text',esc(v('no',L.tc||tcNext(yr)+'/'+yr)))}${f('tc_issue','സർട്ടിഫിക്കറ്റ് കൊടുക്കുന്ന തീയതി','date',iss)}</div>
+<label>പ്രവൃത്തി ദിവസം കണക്കാക്കേണ്ട വർഷാരംഭ തീയതി<input id="tc_ys" type="date" value="${ys}" onchange="tcCalc(${no})"></label>
+${F.map(([k,l,d])=>f('tc_'+k,l,'text',esc(v(k,d)))).join('')}
+<p><button class="pri" onclick="tcMake(${no})">TC തയ്യാറാക്കുക</button></p></div>`}
+function tcCalc(no){const s=db.students.find(x=>x.no==no),w=wd(s,$('#tc_ys').value,(s.left||{}).date||today);$('#tc_w15').value=w.w;$('#tc_w16').value=w.p}
+function tcMake(no){const s=db.students.find(x=>x.no==no),T={no:val('tc_no'),issue:val('tc_issue'),ys:val('tc_ys')};if(!T.no||!T.issue)return alert('TC നമ്പറും തീയതിയും വേണം');
+if(db.students.some(x=>x.no!=no&&((x.tc&&x.tc.no)||(x.left&&x.left.tc))==T.no&&T.issue.slice(0,4)==((x.tc&&x.tc.issue)||T.issue).slice(0,4)))return alert('ഈ TC നമ്പർ മറ്റൊരു കുട്ടിക്ക് നൽകിയിട്ടുണ്ട്');
+window._tcF.forEach(k=>T[k]=val('tc_'+k));s.tc=T;s.left=s.left||{};s.left.tc=T.no;if(T.to)s.left.to=T.to;if(/വാങ്ങാതെ/.test(s.left.how||''))s.left.how='TC വാങ്ങി';save();tcView(no)}
+function tcView(no){const s=db.students.find(x=>x.no==no);window._tc=tcHtml(s.tc);
+$('#pg').innerHTML=`<p><button class="sm" onclick="tcForm(${no})">‹ തിരുത്താൻ</button> <button class="sm" onclick="stu()">കുട്ടികളുടെ ലിസ്റ്റ്</button></p>${btns('_tc','TC-'+no)}<div class="scroll card">${window._tc}</div>`}
+function tcHtml(T){const e=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;'),
+r=(n,en,ml,v)=>`<div class="tcr"><div class="tcl">${n?n+'. ':''}${en}</div><div class="tcm">${ml}</div><div class="tcv">${e(v)||'&nbsp;'}</div></div>`,
+hd=x=>`<div class="tch"><b class="tc1">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b>${x}</div>`,
+mk=[T.m1,T.m2].filter(Boolean).join(', ');
+return `<style>@page{size:A4 portrait;margin:6mm}.tc{font-size:10px;line-height:1.25;color:#000;background:#fff}.tch{text-align:center;margin-bottom:4px}.tc1{font-size:17px}.tcr{margin:3px 0}.tcl{font-weight:600}.tcm{font-size:9.5px}.tcv{border-bottom:1px dotted #000;min-height:14px;font-weight:700;padding:0 4px}.tcp{display:flex;gap:14px}.tcp>div{flex:1}.tcn{display:flex;justify-content:space-between;gap:10px;margin:4px 0;font-weight:700}</style><div class="tc">
+${hd('<br><b>TRANSFER CERTIFICATE</b>')}
+<div class="tcn"><span>T.C. No. ${e(T.no)}</span><span>Admission No. and Date (പ്രവേശന നമ്പർ, തീയതി): ${e(T.adm)}</span></div>
+<div class="tcp"><div>${r(1,'Name and Initial of the pupil','വിദ്യാർത്ഥിയുടെ പേരും ഇനീഷ്യലും',T.name)}</div><div>${r(2,'Date of Birth','ജനന തിയ്യതി',T.dobF)}</div></div>
+${r(3,'Name of Gaurdian and Address','രക്ഷിതാവിൻ്റെ പേരും വിലാസവും',T.guard)}
+${r(4,'Name, Place and Recognition No. of Madras to which the pupil intends proceeding','ചേരാനുദ്ദേശിക്കുന്ന മദ്റസയുടെ പേരും സ്ഥലവും അംഗീകരണ നമ്പറും',T.to)}
+<div class="tcp"><div>${r(5,'Date of Issue of Certificate','സർട്ടിഫിക്കറ്റ് കൊടുത്ത തിയ്യതി',D(T.issue))}</div><div>${r(6,'Standard on Leaving','വിട്ട ക്ലാസ്',T.std)}</div></div>
+${r(7,'Personal Marks of Identification','തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ',mk)}
+<div style="text-align:right;margin-top:12px">Name and Signature of Sadar Muallim (സ്വദർ മുഅല്ലിമിൻ്റെ പേരും ഒപ്പും) ..............................</div>
+<div style="margin-top:6px">TC കിട്ടി ബോധിച്ചു (കൈപ്പറ്റിയ ആളുടെ പേരും ഒപ്പും) ..............................................</div>
+<div style="border-top:1px dashed #000;margin:8px 0"></div>
+${hd('<br>Samastha Centre, Kozhikode - 673006<br><b>TRANSFER CERTIFICATE (മദ്റസാ വിദ്യാർത്ഥികളുടെ വിടുതൽ സർട്ടിഫിക്കറ്റ്)</b>')}
+<div class="tcn"><span>T.C. No. ${e(T.no)}</span><span>Admission No. and Date (പ്രവേശന നമ്പർ, തീയതി): ${e(T.adm)}</span></div>
+${r(1,'Name and Recognition No. of Madrasa','മദ്റസയുടെ പേരും അംഗീകാര നമ്പറും',T.mad)}
+${r(2,'Name and Initial of the pupil','വിദ്യാർത്ഥിയുടെ പേരും ഇനീഷ്യലും',T.name)}
+${r(3,'Name of Father','പിതാവിൻ്റെ പേര്',T.father)}
+${r(4,'Name of Guardian, Occupation and Adress','രക്ഷിതാവിൻ്റെ പേര്, ജോലി, മേൽവിലാസം',T.guard)}
+${r(5,'Age and Date of Birth According to Admission Register (in Figures and in words)','അഡ്മിഷൻ രജിസ്റ്റർ അനുസരിച്ചുള്ള ജനന തീയതി (അക്കത്തിൽ / അക്ഷരത്തിൽ)',T.dobF+(T.dobW?'  /  '+T.dobW:''))}
+${r(6,'Standard in which the pupil last studied (in words)','മദ്റസ വിടുന്ന അവസരത്തിൽ പഠിച്ചിരുന്ന ക്ലാസ് (അക്ഷരത്തിൽ)',T.std)}
+${r(7,'Date of Admission or promotion to that standard','പ്രസ്തുത ക്ലാസിലേക്ക് പ്രവേശനം ലഭിച്ച തിയ്യതി',T.admStd)}
+${r(8,'Whether qualified for promotion to higher standard or not?','പ്രസ്തുത ക്ലാസിൽ നിന്ന് (വാർഷിക പരീക്ഷയിൽ പങ്കെടുത്തിട്ടുണ്ടെങ്കിൽ) കയറ്റത്തിന് അർഹതയുണ്ടോ?',T.qual)}
+${r(9,'Date of last attendance of the pupil','മദ്റസയിൽ ഹാജരായ അവസാന തിയ്യതി',T.lastAtt)}
+${r(10,'Date on which the name was removed from roll','രജിസ്റ്ററിൽ നിന്ന് പേര് നീക്കിയ തിയ്യതി',T.removed)}
+<div class="tcp"><div>${r(11,'Date of Application for certificate','സർട്ടിഫിക്കറ്റിന് അപേക്ഷിച്ച തിയ്യതി',T.app)}</div><div>${r(12,'Date of issue of certificate','സർട്ടിഫിക്കറ്റ് കൊടുത്ത തിയ്യതി',D(T.issue))}</div></div>
+${r(13,'Reason for leaving','വിടാനുള്ള കാരണം',T.reason)}
+${r(14,'Madrasa to which the pupil intends proceeding','സർട്ടിഫിക്കറ്റ് മൂലം ചേരാനുദ്ദേശിക്കുന്ന മദ്റസ',T.to)}
+<div class="tcp"><div>${r(15,'No. of working days up to the date','വിടുന്ന തിയ്യതി വരെയുള്ള പ്രവർത്തി ദിവസങ്ങൾ',T.w15)}</div><div>${r(16,'No. of working days the pupil attended','വിദ്യാർത്ഥി ഹാജരായ ദിവസങ്ങൾ (ഈ വർഷം)',T.w16)}</div></div>
+${r(17,'Conduct of the pupil','വിദ്യാർത്ഥിയുടെ സ്വഭാവം',T.conduct)}
+${r(18,'Personal marks of Identification','തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ  1. '+(T.m1||'')+'   2. '+(T.m2||''),'')}
+<div style="display:flex;justify-content:space-between;margin-top:22px"><span>Madrasa Seal (മദ്റസയുടെ സീൽ)</span><span>Name and Signature of Sadar Muallim</span></div></div>`}
+function delC(id){if(db.students.some(s=>s.classId==id&&!s.left))return alert('ഈ ക്ലാസിൽ കുട്ടികളുണ്ട്. ആദ്യം അവരെ മറ്റ് ക്ലാസിലേക്ക് മാറ്റുക / വിടുതൽ ചെയ്യുക');if(confirm('ക്ലാസ് നീക്കട്ടെ?')){db.classes=db.classes.filter(c=>c.id!=id);save();set()}}
 function bk(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download='madrasa-backup-'+today+'.json';a.click()}
 function rs(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{db=Object.assign(db,JSON.parse(r.result));save();api('adminRestore',{pin:PIN,att:db.att||{},apps:db.apps||[]}).then(()=>{alert('റീസ്റ്റോർ ചെയ്തു');go()}).catch(e=>alert(e.message))}catch(e){alert('ഫയൽ ശരിയല്ല')}};r.readAsText(file)}
 const sp=sessionStorage.getItem('madrasa_pin');if(sp)login(sp);

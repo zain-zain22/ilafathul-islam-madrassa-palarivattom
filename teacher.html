@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ml"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>അധ്യാപകർ – ഹാജർ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3ef;--sf:#fff;--tx:#17251e;--mu:#58685f;--ac:#17694a;--ac2:#e1f0e8;--bd:#d3ddd6;--rd:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a16;--sf:#1b2621;--tx:#e8efe9;--mu:#9bb0a4;--ac:#5fc79a;--ac2:#22372d;--bd:#33463c;--rd:#ff8a80}}
+:root[data-theme="dark"]{--bg:#121a16;--sf:#1b2621;--tx:#e8efe9;--mu:#9bb0a4;--ac:#5fc79a;--ac2:#22372d;--bd:#33463c;--rd:#ff8a80}
+html,body{margin:0;font-size:16px;background:var(--bg);color:var(--tx);font-family:'Noto Sans Malayalam',system-ui,sans-serif;line-height:1.6}
+body{padding:0 12px 40px;max-width:900px;margin:auto}
+h1{font-size:21px;margin:0 -12px 8px;padding:18px 16px 16px;background:var(--ac);color:var(--bg);border-radius:0 0 22px 22px}h2{font-size:18px;margin:20px 0 8px}
+.tabs{display:flex;gap:8px;margin:12px 0;overflow-x:auto;padding-bottom:4px}.tabs button{white-space:nowrap;border-radius:999px;padding:10px 16px}
+button,select,input,textarea{font:inherit;color:var(--tx)}
+button{border:1px solid var(--bd);background:var(--sf);padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:600;min-height:44px}
+button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.sm{padding:4px 9px;font-size:13px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+label{display:block;font-size:13px;color:var(--mu);margin-top:8px}
+input,select,textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);min-height:44px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.row{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:14px 6px;font-size:17px;border-bottom:1px solid var(--bd)}.row b{min-width:38px;text-align:center;padding:5px 0;border-radius:10px;background:var(--ac2);color:var(--ac)}.row.ab b{background:var(--rd);color:#fff}
+.row.ab{color:var(--rd);font-weight:600;background:rgba(179,38,30,.08);border-radius:10px}
+.mu{color:var(--mu);font-size:13px}.warn{color:var(--rd)}
+.stat{display:flex;gap:8px;flex-wrap:wrap}.stat div{flex:1;min-width:90px;background:var(--ac2);padding:8px;border-radius:8px}.stat b{font-size:22px;display:block}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-size:12px}th,td{border:1px solid #444;padding:3px 5px;text-align:center;vertical-align:top}
+#print{display:none}
+@media print{@page{size:A4 landscape;margin:6mm}html,body{padding:0!important;margin:0!important;max-width:none!important;background:#fff}body>*:not(#print){display:none!important}#print{display:block;color:#000;background:#fff;width:100%;box-sizing:border-box;padding:0 5mm;overflow:hidden}#print h3{margin:0 0 6px}#print table{width:100%!important;table-layout:fixed}#print td,#print th{overflow:hidden;word-break:break-word;padding:2px 1px}#print td[style*="nowrap"]{white-space:nowrap!important;text-overflow:ellipsis}#print table{font-size:9px}}
+</style></head><body>
+<h1 id="ttl">മദ്രസ മാനേജർ</h1>
+<div class="mu" id="qb"></div>
+<div id="app"></div>
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbxBzUzcsGppeWVO87RiHysygaAz-bCnf6r8JgKDGyw0zgvx1jnSnPOe404qK0YEFRpZVg/exec';
+const $=s=>document.querySelector(s);
+async function api(action,data){const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({action,...data})});const j=await r.json();if(!j.ok)throw new Error(j.error||'error');return j.data}
+const MONTHS=['ജനുവരി','ഫെബ്രുവരി','മാർച്ച്','ഏപ്രിൽ','മേയ്','ജൂൺ','ജൂലൈ','ഓഗസ്റ്റ്','സെപ്റ്റംബർ','ഒക്ടോബർ','നവംബർ','ഡിസംബർ'];
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=iso(new Date());
+const f=(id,l,t='text',v='')=>`<label>${l}<input id="${id}" type="${t}" value="${v}"></label>`;
+const val=id=>$('#'+id).value.trim();
+const opts=(arr,cur)=>arr.map(c=>`<option value="${c.id}" ${c.id==cur?'selected':''}>${c.name}</option>`).join('');
+const cls=id=>db.classes.find(c=>c.id==id)||{name:'-'};
+const stuIn=c=>db.students.filter(s=>s.classId==c&&!s.left).sort((a,b)=>a.no-b.no);
+function tabs(list){return`<div class="tabs">`+list.map(([k,v])=>`<button class="${tab==k?'on':''}" onclick="tab='${k}';go()">${v}</button>`).join('')+`</div>`}
+function pending(c){const days=Object.keys(db.att).filter(k=>k.startsWith(c+'|')).map(k=>k.split('|')[1]).sort();if(!days.length)return[];
+const out=[];let d=new Date(days[days.length-1]+'T00:00');d.setDate(d.getDate()+1);while(iso(d)<today){if(d.getDay()!=0)out.push(iso(d));d.setDate(d.getDate()+1)}return out}
+
+let db={classes:[],students:[],att:{}},tview='menu',teacher=null,tName='',tMsr='';
+const sel={cls:null,date:today,month:today.slice(0,7)};
+const QK='madrasa_q',cache=()=>{try{localStorage.setItem('madrasa_t',JSON.stringify(db))}catch(e){}};
+const getQ=()=>{try{return JSON.parse(localStorage.getItem(QK))||[]}catch(e){return[]}};
+const setQ=q=>{try{localStorage.setItem(QK,JSON.stringify(q))}catch(e){}};
+const H=s=>{let h=5381;for(const ch of s)h=((h<<5)+h+ch.charCodeAt(0))|0;return'h'+h};
+const vt=()=>{try{return JSON.parse(localStorage.getItem('madrasa_vt'))||{}}catch(e){return{}}};
+function enqueue(r){const q=getQ();q.push(r);setQ(q);badge()}
+function badge(){const n=getQ().length;$('#qb').innerHTML=n?'⏳ '+n+' എണ്ണം അയയ്ക്കാൻ ബാക്കി — നെറ്റ് കിട്ടിയാൽ സ്വയം അയക്കും':''}
+function applyQ(){getQ().forEach(r=>{db.att[r.cls+'|'+r.date]=r.kind=='hol'?{holiday:r.holiday}:{absent:r.absent}})}
+async function load(){try{db=await api('tData');cache()}catch(e){try{db=JSON.parse(localStorage.getItem('madrasa_t'))||db}catch(x){}}applyQ();if(db.madrasa)$('#ttl').textContent=db.madrasa}
+let busy=false;
+async function flush(){if(busy)return;busy=true;let q=getQ();
+while(q.length){try{await api('tSubmit',{rec:q[0]})}catch(e){if(!String(e.message).startsWith('REJECT'))break}q.shift();setQ(q)}
+busy=false;badge();if(!getQ().length&&navigator.onLine){await load();if(tview=='menu')teacher_()}}
+async function chkMsr(){const v=val('msr');if(!v)return alert('MSR നമ്പർ നൽകുക');let t=null;
+try{t=await api('tCheck',{msr:v});if(t){const m=vt();m[H(v)]=t;localStorage.setItem('madrasa_vt',JSON.stringify(m))}}
+catch(e){t=vt()[H(v)]||null;if(!t)return alert('നെറ്റ് ഇല്ല. ഈ MSR നമ്പർ ഈ ഫോണിൽ മുമ്പ് പരിശോധിച്ചിട്ടില്ല')}
+if(!t)return alert('ഈ MSR നമ്പർ കണ്ടെത്താനായില്ല');teacher=t.id;tName=t.name;tMsr=v;tview='cls';teacher_()}
+function openC(id){sel.cls=id;absent=new Set();tview='msr';teacher_()}
+function teacher_(){
+if(tview=='msr'){$('#app').innerHTML=`<p><button class="sm" onclick="tview='menu';teacher_()">‹ ക്ലാസുകൾ</button></p><h2>${cls(sel.cls).name}</h2><div class="card">${f('msr','അറ്റൻഡൻസ് എടുക്കുന്ന അധ്യാപകൻ്റെ MSR നമ്പർ')}<p><button class="pri" onclick="chkMsr()">തുടരുക</button></p><p class="mu">പകരം എടുക്കുന്നവരും സ്വന്തം MSR നമ്പർ നൽകുക. ഒപ്പ് ആ അധ്യാപകൻ്റേത് വരും.</p></div>`;return}
+if(tview=='cls'){const t={name:tName};$('#app').innerHTML=`<p><button class="sm" onclick="tview='menu';teacher=null;teacher_()">‹ ക്ലാസുകൾ</button></p><h2>${cls(sel.cls).name}</h2><p class="mu">എടുക്കുന്നത്: ${t.name||''}</p><div id="att"></div>`;attForm();return}
+const st=c=>{const p=pending(c.id).length;return db.att[c.id+'|'+today]?'✓ ഇന്ന് കഴിഞ്ഞു':p?p+' ദിവസം ബാക്കി':'ഇന്ന് ബാക്കി'};
+$('#app').innerHTML=`<h2>ക്ലാസ് തിരഞ്ഞെടുക്കുക</h2>`+(db.classes.map(c=>`<div class="row" onclick="openC('${c.id}')"><span>${c.name}<br><span class="mu">സെക്ഷൻ ${c.sess} · ${st(c)} · ${stuIn(c.id).length} കുട്ടികൾ</span></span><b>›</b></div>`).join('')||'<p class="mu">ക്ലാസുകളില്ല.</p>')}
+let absent=new Set();
+function attForm(){const c=sel.cls,p=pending(c);let date=sel.date,h='';
+if(p.length){date=p[0];h=`<div class="card"><b class="warn">${date} ലെ ഹാജർ ബാക്കിയാണ്</b><p class="mu">ഇത് പൂർത്തിയാക്കിയാലേ പുതിയ ദിവസം തുറക്കൂ. ഹാജർ ഇടുക, അല്ലെങ്കിൽ അവധി കാരണം നൽകുക.</p>${f('hol','അവധി കാരണം (ഉദാ: മഴ അവധി)')}<button onclick="holiday('${c}','${date}')">അവധിയായി രേഖപ്പെടുത്തുക</button></div>`}
+else{h=`${f('adate','തീയതി','date',date)}`;}
+const done=db.att[c+'|'+date];
+if(!p.length){setTimeout(()=>{const a=$('#adate');if(a)a.onchange=()=>{sel.date=a.value;absent=new Set();attForm()}},0)}
+if(new Date(date+'T00:00').getDay()==0&&!p.length)return $('#att').innerHTML=h+'<p class="mu">ഞായർ അവധിയാണ്.</p>';
+if(done&&done.holiday)return $('#att').innerHTML=h+`<p class="mu">അവധി: ${done.holiday}</p>`;
+if(done&&!absent.size&&!window._edit){absent=new Set(done.absent)}
+const st=stuIn(c);$('#att').innerHTML=h+`<p class="mu">എല്ലാവരും ഹാജർ (×). വരാത്തവരെ മാത്രം ടാപ്പ് ചെയ്യുക.${done?' <b>(ഇത് മുമ്പ് സമർപ്പിച്ചത്)</b>':''}</p>`+
+st.map(s=>`<div class="row ${absent.has(s.no)?'ab':''}" onclick="tg(${s.no})"><span>${s.no}. ${s.name}</span><b>${absent.has(s.no)?'A':'×'}</b></div>`).join('')+(st.length?`<p><button class="pri" onclick="submitAtt('${c}','${date}')">സമർപ്പിക്കുക</button></p>`:'<p class="mu">ക്ലാസിൽ കുട്ടികളില്ല.</p>');att_date=date}
+let att_date;
+function tg(n){absent.has(n)?absent.delete(n):absent.add(n);attForm()}
+function submitAtt(c,d){const n=stuIn(c).length,a=absent.size;if(!confirm(`ഇന്ന് ഹാജർ: ${n-a} / ${n}. ഉറപ്പാണോ?`))return;
+enqueue({kind:'att',cls:c,date:d,absent:[...absent],msr:tMsr,at:new Date().toISOString()});db.att[c+'|'+d]={absent:[...absent],by:teacher};absent=new Set();cache();sel.date=today;tview='menu';teacher=null;tMsr='';teacher_();flush()}
+function holiday(c,d){const r=val('hol');if(!r)return alert('കാരണം ടൈപ്പ് ചെയ്യുക');enqueue({kind:'hol',cls:c,date:d,holiday:r,msr:tMsr,at:new Date().toISOString()});db.att[c+'|'+d]={holiday:r,by:teacher};cache();teacher_();flush()}
+
+
+(async()=>{try{db=JSON.parse(localStorage.getItem('madrasa_t'))||db}catch(e){}applyQ();badge();teacher_();await load();if(tview=='menu')teacher_();flush()})();
+addEventListener('online',flush);
+
+</script></body></html>

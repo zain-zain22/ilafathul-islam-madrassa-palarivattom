@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ml"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>പ്രവേശന അപേക്ഷ – Gemini Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3ef;--sf:#fff;--tx:#17251e;--mu:#58685f;--ac:#17694a;--ac2:#e1f0e8;--bd:#d3ddd6;--rd:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a16;--sf:#1b2621;--tx:#e8efe9;--mu:#9bb0a4;--ac:#5fc79a;--ac2:#22372d;--bd:#33463c;--rd:#ff8a80}}
+:root[data-theme="dark"]{--bg:#121a16;--sf:#1b2621;--tx:#e8efe9;--mu:#9bb0a4;--ac:#5fc79a;--ac2:#22372d;--bd:#33463c;--rd:#ff8a80}
+html,body{margin:0;font-size:16px;background:var(--bg);color:var(--tx);font-family:'Noto Sans Malayalam',system-ui,sans-serif;line-height:1.6}
+body{padding:0 12px 40px;max-width:900px;margin:auto}
+h1{font-size:21px;margin:0 -12px 8px;padding:18px 16px 16px;background:var(--ac);color:var(--bg);border-radius:0 0 22px 22px}h2{font-size:18px;margin:20px 0 8px}
+button,select,input,textarea{font:inherit;color:var(--tx)}
+button{border:1px solid var(--bd);background:var(--sf);padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:600;min-height:44px}
+button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.sm{padding:6px 12px;font-size:13px;min-height:36px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+label{display:block;font-size:13px;color:var(--mu);margin-top:8px}
+input,select,textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);min-height:44px}
+.mu{color:var(--mu);font-size:13px}.warn{color:var(--rd)}
+.ref-box{background:var(--ac2);border:1px solid var(--ac);border-radius:14px;padding:12px;margin:10px 0}
+#print{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{padding:0!important;margin:0!important;max-width:none!important;background:#fff;color:#000}
+  body>*:not(#print){display:none!important}
+  #print{display:block;color:#000;background:#fff;width:100%}
+}
+</style></head><body>
+<h1 id="ttl">മദ്രസ മാനേജർ</h1>
+<div id="app"></div>
+<div id="print"></div>
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbxBzUzcsGppeWVO87RiHysygaAz-bCnf6r8JgKDGyw0zgvx1jnSnPOe404qK0YEFRpZVg/exec';
+const $=s=>document.querySelector(s);
+async function api(action,data){const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({action,...data})});const j=await r.json();if(!j.ok)throw new Error(j.error||'error');return j.data}
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=iso(new Date());
+const f=(id,l,t='text',v='')=>`<label>${l}<input id="${id}" type="${t}" value="${v}"></label>`;
+const val=id=>$('#'+id).value.trim();
+const opts=(arr,cur)=>arr.map(c=>`<option value="${c.id}" ${c.id==cur?'selected':''}>${c.name}</option>`).join('');
+const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+let pSigData='', pHasDrawn=false;
+function initPSig(){
+  pSigData=''; pHasDrawn=false;
+  const c=$('#p_sig_canvas'); if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.lineWidth=2.5;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.strokeStyle='#111111';
+  let drawing=false;
+  const pt=e=>{
+    const r=c.getBoundingClientRect();
+    return [(e.clientX-r.left)*(c.width/r.width),(e.clientY-r.top)*(c.height/r.height)];
+  };
+  c.onpointerdown=e=>{
+    drawing=true; pHasDrawn=true;
+    const[x,y]=pt(e);
+    ctx.beginPath(); ctx.moveTo(x,y);
+    c.setPointerCapture(e.pointerId);
+  };
+  c.onpointermove=e=>{
+    if(!drawing)return;
+    const[x,y]=pt(e);
+    ctx.lineTo(x,y); ctx.stroke();
+  };
+  c.onpointerup=()=>{
+    if(!drawing)return;
+    drawing=false;
+    pSigData=c.toDataURL('image/jpeg',0.75);
+  };
+}
+function clrPSig(){initPSig()}
+
+function appFormHtml(d){
+  const clsName=(db.classes.find(c=>c.id==d.classId)||{}).name||'';
+  return `<div style="font-family:'Noto Sans Malayalam',sans-serif;color:#000;line-height:1.5;font-size:13px">
+    <h2 style="text-align:center;margin:0 0 4px">${esc(db.madrasa||'മദ്രസ')}</h2>
+    <div style="text-align:center;margin-bottom:12px"><b>പ്രവേശന അപേക്ഷാ ഫോം</b> ${d.refNo?'<br><span style="font-size:12px">റഫറൻസ് നമ്പർ: <b>'+esc(d.refNo)+'</b></span>':''}</div>
+    <table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
+      <tr><td style="width:36%"><b>അപേക്ഷാ തീയതി</b></td><td>${esc(d.date||today)}</td></tr>
+      <tr><td><b>കുട്ടിയുടെ പേരും ഇനീഷ്യലും</b></td><td>${esc(d.name)}</td></tr>
+      <tr><td><b>ആൺ / പെൺ</b></td><td>${esc(d.gender)}</td></tr>
+      <tr><td><b>വീട്ടുപേര്</b></td><td>${esc(d.house)}</td></tr>
+      <tr><td><b>പിതാവിന്റെ/മാതാവിന്റെ പേര്, വീട്ടുപേര്</b></td><td>${esc(d.parent)}</td></tr>
+      <tr><td><b>രക്ഷിതാവിന്റെ പേര്, വീട്ടുപേര്</b></td><td>${esc(d.guardian)}</td></tr>
+      <tr><td><b>ഫോൺ നമ്പർ</b></td><td>${esc(d.phone)}</td></tr>
+      <tr><td><b>രക്ഷിതാവുമായുള്ള ബന്ധം</b></td><td>${esc(d.rel)}</td></tr>
+      <tr><td><b>രക്ഷിതാവിന്റെ ജോലി, മേൽവിലാസം</b></td><td>${esc(d.job)}</td></tr>
+      <tr><td><b>ജനന തീയതി</b></td><td>${esc(d.dob)}</td></tr>
+      <tr><td><b>ചേർക്കേണ്ട ക്ലാസ്</b></td><td>${esc(clsName)}</td></tr>
+      <tr><td><b>തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ</b></td><td>${esc(d.mark)}</td></tr>
+      <tr><td><b>മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി</b></td><td>${esc(d.prev)}</td></tr>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px">
+      <div>രക്ഷിതാവിന്റെ ഒപ്പ്:<br>${d.sig?'<img src="'+d.sig+'" style="height:55px;max-width:180px;border:1px solid #ccc">':'........................'}</div>
+      <div style="text-align:right">സദർ മുഅല്ലിമിന്റെ പരിശോധന / ഒപ്പ്:<br>........................</div>
+    </div>
+  </div>`;
+}
+
+function parent_(){
+  $('#app').innerHTML=`<h2>പ്രവേശന അപേക്ഷ</h2><div class="card">
+${f('p_name','കുട്ടിയുടെ പേരും ഇനീഷ്യലും')}<label>ആൺ / പെൺ<select id="p_g"><option>ആൺ</option><option>പെൺ</option></select></label>
+${f('p_house','വീട്ടുപേര്')}${f('p_par','പിതാവിൻ്റെ/മാതാവിൻ്റെ പേര്, വീട്ടുപേര്')}
+${f('p_gu','രക്ഷിതാവിൻ്റെ പേര്, വീട്ടുപേര്')}${f('p_ph','ഫോൺ നമ്പർ','tel')}
+${f('p_rel','രക്ഷിതാവുമായുള്ള ബന്ധം')}${f('p_job','രക്ഷിതാവിൻ്റെ ജോലി, മേൽവിലാസം')}
+${f('p_dob','ജനന തീയതി','date')}<label>ചേർക്കേണ്ട ക്ലാസ്<select id="p_cls">${opts(db.classes)}</select></label>
+${f('p_mark','തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ')}${f('p_prev','മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി')}
+<label>രക്ഷിതാവിന്റെ ഒപ്പ് (വിരൽ കൊണ്ട് വരയ്ക്കുക)</label>
+<canvas id="p_sig_canvas" width="420" height="130" style="width:100%;max-width:420px;border:1px solid var(--bd);border-radius:12px;background:#fff;touch-action:none"></canvas>
+<div><button type="button" class="sm" onclick="clrPSig()">ഒപ്പ് മായ്ക്കുക</button></div>
+<label style="display:flex;gap:8px;align-items:center"><input id="p_ok" type="checkbox" style="width:auto"> നൽകിയ വിവരങ്ങൾ ശരിയാണ്, ബോർഡിൻ്റെ നിയമങ്ങൾ പാലിക്കും</label>
+<p><button class="pri" onclick="submitApp()">അപേക്ഷ സമർപ്പിക്കുക</button></p></div>`;
+  initPSig();
+}
+
+async function submitApp(){
+  if(!val('p_name')||!val('p_ph')||!val('p_dob'))return alert('പേര്, ഫോൺ, ജനന തീയതി നൽകുക');
+  if(!pHasDrawn||!pSigData)return alert('രക്ഷിതാവിന്റെ ഒപ്പ് രേഖപ്പെടുത്തുക');
+  if(!$('#p_ok').checked)return alert('സത്യവാങ്മൂലം ടിക് ചെയ്യുക');
+  const payload={
+    id:Date.now(),date:today,name:val('p_name'),gender:$('#p_g').value,
+    house:val('p_house'),parent:val('p_par'),guardian:val('p_gu'),
+    phone:val('p_ph'),rel:val('p_rel'),job:val('p_job'),dob:val('p_dob'),
+    classId:$('#p_cls').value,mark:val('p_mark'),prev:val('p_prev'),
+    sig:pSigData
+  };
+  try{
+    const res=await api('submitApp',{app:payload});
+    const refNo=(res&&res.refNo)?res.refNo:('APP-'+payload.id);
+    const fullRec={...payload,refNo};
+    window._lastAppHtml=appFormHtml(fullRec);
+    $('#app').innerHTML=`<div class="card">
+      <b>അപേക്ഷ ലഭിച്ചു.</b>
+      <div class="ref-box">റഫറൻസ് നമ്പർ: <b>${esc(refNo)}</b><div class="mu">ഭാവിയിലെ ആവശ്യങ്ങൾക്കായി ഈ നമ്പർ സൂക്ഷിക്കുക.</div></div>
+      <p class="mu">മദ്രസ അംഗീകരിച്ച ശേഷം അറിയിക്കും.</p>
+      <p><button class="pri" onclick="printApp()">🖨️ അപേക്ഷ പ്രിന്റ് ചെയ്യുക (Portrait)</button> <button onclick="parent_()">മറ്റൊരു അപേക്ഷ</button></p>
+    </div>`;
+  }catch(e){
+    return alert('അപേക്ഷ അയയ്ക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.');
+  }
+}
+
+function printApp(){
+  if(!window._lastAppHtml)return;
+  $('#print').innerHTML=window._lastAppHtml;
+  window.print();
+}
+
+let db={madrasa:'',mno:'',classes:[]};
+(async()=>{
+  try{db=await api('pData');localStorage.setItem('madrasa_pc',JSON.stringify(db))}
+  catch(e){try{db=JSON.parse(localStorage.getItem('madrasa_pc'))||db}catch(x){}}
+  if(db.madrasa)$('#ttl').textContent=db.madrasa;
+  parent_();
+})();
+</script></body></html>

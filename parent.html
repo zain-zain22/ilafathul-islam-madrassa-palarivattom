@@ -4,6 +4,7 @@
 <meta name="robots" content="noindex">
 <title>പ്രവേശന അപേക്ഷ</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{--bg:#eef3ef;--sf:#fff;--tx:#17251e;--mu:#58685f;--ac:#17694a;--ac2:#e1f0e8;--bd:#d3ddd6;--rd:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a16;--sf:#1b2621;--tx:#e8efe9;--mu:#9bb0a4;--ac:#5fc79a;--ac2:#22372d;--bd:#33463c;--rd:#ff8a80}}
@@ -30,7 +31,7 @@ table{border-collapse:collapse;font-size:12px}th,td{border:1px solid #444;paddin
 @media print{@page{size:A4 landscape;margin:6mm}html,body{padding:0!important;margin:0!important;max-width:none!important;background:#fff}body>*:not(#print){display:none!important}#print{display:block;color:#000;background:#fff;width:100%;box-sizing:border-box;padding:0 5mm;overflow:hidden}#print h3{margin:0 0 6px}#print table{width:100%!important;table-layout:fixed}#print td,#print th{overflow:hidden;word-break:break-word;padding:2px 1px}#print td[style*="nowrap"]{white-space:nowrap!important;text-overflow:ellipsis}#print table{font-size:9px}}
 </style></head><body>
 <h1 id="ttl">മദ്രസ മാനേജർ</h1>
-<div id="app"></div>
+<div id="app"></div><div id="print"></div>
 <script>
 const API_URL='https://script.google.com/macros/s/AKfycbxBzUzcsGppeWVO87RiHysygaAz-bCnf6r8JgKDGyw0zgvx1jnSnPOe404qK0YEFRpZVg/exec';
 const $=s=>document.querySelector(s);
@@ -52,12 +53,42 @@ ${f('p_gu','രക്ഷിതാവിൻ്റെ പേര്, വീട്�
 ${f('p_rel','രക്ഷിതാവുമായുള്ള ബന്ധം')}${f('p_job','രക്ഷിതാവിൻ്റെ ജോലി, മേൽവിലാസം')}
 ${f('p_dob','ജനന തീയതി','date')}<label>ചേർക്കേണ്ട ക്ലാസ്<select id="p_cls">${opts(db.classes)}</select></label>
 ${f('p_mark','തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ')}${f('p_prev','മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി')}
-<label style="display:flex;gap:8px;align-items:center"><input id="p_ok" type="checkbox" style="width:auto"> നൽകിയ വിവരങ്ങൾ ശരിയാണ്, ബോർഡിൻ്റെ നിയമങ്ങൾ പാലിക്കും</label>
-<p><button class="pri" onclick="submitApp()">അപേക്ഷ സമർപ്പിക്കുക</button></p></div>`}
-async function submitApp(){if(!val('p_name')||!val('p_ph')||!val('p_dob'))return alert('പേര്, ഫോൺ, ജനന തീയതി നൽകുക');if(!$('#p_ok').checked)return alert('സത്യവാങ്മൂലം ടിക് ചെയ്യുക');
-try{await api('submitApp',{app:{id:Date.now(),date:today,name:val('p_name'),gender:$('#p_g').value,house:val('p_house'),parent:val('p_par'),guardian:val('p_gu'),phone:val('p_ph'),rel:val('p_rel'),job:val('p_job'),dob:val('p_dob'),classId:$('#p_cls').value,mark:val('p_mark'),prev:val('p_prev')}});}catch(e){return alert('അപേക്ഷ അയയ്ക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.')}
-$('#app').innerHTML='<div class="card"><b>അപേക്ഷ ലഭിച്ചു.</b><p class="mu">മദ്രസ അംഗീകരിച്ച ശേഷം അറിയിക്കും.</p><button onclick="parent_()">മറ്റൊരു അപേക്ഷ</button></div>'}
+<b>രക്ഷിതാവിൻ്റെ ഒപ്പ്</b><p class="mu">ചുവടെ വിരൽ കൊണ്ട് ഒപ്പിടുക.</p><canvas id="sg_g" style="${CV}"></canvas><p><button class="sm" onclick="sigClr('sg_g')">മായ്ക്കുക</button></p><label style="display:flex;gap:8px;align-items:center"><input id="p_ok" type="checkbox" style="width:auto"> നൽകിയ വിവരങ്ങൾ ശരിയാണ്, ബോർഡിൻ്റെ നിയമങ്ങൾ പാലിക്കും</label>
+<p><button class="pri" onclick="submitApp()">അപേക്ഷ സമർപ്പിക്കുക</button></p></div>`;setTimeout(()=>sigPad('sg_g'),0)}
+async function submitApp(){if(!val('p_name')||!val('p_ph')||!val('p_dob'))return alert('പേര്, ഫോൺ, ജനന തീയതി നൽകുക');if(!$('#p_ok').checked)return alert('സത്യവാങ്മൂലം ടിക് ചെയ്യുക');const g=sigGet('sg_g');if(!g)return alert('രക്ഷിതാവിൻ്റെ ഒപ്പ് ഇടുക');
+let rid;try{rid=await api('submitApp',{app:{gsig:g,id:Date.now(),date:today,name:val('p_name'),gender:$('#p_g').value,house:val('p_house'),parent:val('p_par'),guardian:val('p_gu'),phone:val('p_ph'),rel:val('p_rel'),job:val('p_job'),dob:val('p_dob'),classId:$('#p_cls').value,mark:val('p_mark'),prev:val('p_prev')}});}catch(e){return alert('അപേക്ഷ അയയ്ക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.')}
+const A={id:rid,date:today,name:val('p_name'),gender:$('#p_g').value,house:val('p_house'),parent:val('p_par'),guardian:val('p_gu'),phone:val('p_ph'),rel:val('p_rel'),job:val('p_job'),dob:val('p_dob'),mark:val('p_mark'),prev:val('p_prev'),gsig:g};
+window._ap=appHtml(A,{mad:db.madrasa,mno:db.mno,cls:cls($('#p_cls').value).name});
+$('#app').innerHTML=`<div class="card"><b>അപേക്ഷ ലഭിച്ചു ✓</b><p>റഫറൻസ് നമ്പർ: <b>${String(rid).slice(-6)}</b></p><p class="mu">ഈ നമ്പർ സൂക്ഷിക്കുക (സ്ക്രീൻഷോട്ട് എടുക്കാം). മദ്രസ അംഗീകരിച്ച ശേഷം അറിയിക്കും.</p><p><button class="pri" onclick="pr(window._ap)">🖨️ പ്രിൻ്റ്</button> <button onclick="pdfP()">⬇ PDF</button></p></div><div class="scroll card" style="background:#fff;color:#000">${window._ap}</div><p><button onclick="parent_()">മറ്റൊരു അപേക്ഷ</button></p>`}
+function pr(h){$('#print').innerHTML=h;window.print()}
+async function pdfP(){try{await pdfMake(window._ap,'application-'+today+'.pdf',true)}catch(e){alert('PDF പരാജയം: '+e.message)}}
 
+
+
+const CV='width:100%;max-width:320px;height:100px;border:1px solid #888;border-radius:8px;background:#fff;touch-action:none;display:block';
+const SGP={};
+function sigPad(id,init){const c=document.getElementById(id);if(!c)return;c.width=300;c.height=100;const x=c.getContext('2d');x.lineWidth=2;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#000';const o={c,x,dirty:false,down:false};SGP[id]=o;
+if(init){const i=new Image();i.onload=()=>{x.drawImage(i,0,0,300,100);o.dirty=true};i.src=init}
+const p=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*300/r.width,(e.clientY-r.top)*100/r.height]};
+c.addEventListener('pointerdown',e=>{e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(z){}o.down=true;o.dirty=true;const[a,b]=p(e);x.beginPath();x.moveTo(a,b);x.lineTo(a+.1,b+.1);x.stroke()});
+c.addEventListener('pointermove',e=>{if(!o.down)return;e.preventDefault();const[a,b]=p(e);x.lineTo(a,b);x.stroke()});
+['pointerup','pointercancel','pointerleave'].forEach(t=>c.addEventListener(t,()=>{o.down=false}))}
+const sigClr=id=>{const o=SGP[id];if(!o)return;o.x.clearRect(0,0,300,100);o.dirty=false};
+const sigGet=id=>{const o=SGP[id];return o&&o.dirty?o.c.toDataURL('image/png'):''};
+async function pdfMake(html,filename,por,asData){const wrap=document.createElement('div');wrap.style.cssText='position:fixed;left:-30000px;top:0';
+const box=document.createElement('div');box.style.cssText='width:'+(por?760:1090)+'px;background:#fff;color:#000;padding:6px';box.innerHTML=html;wrap.appendChild(box);document.body.appendChild(wrap);
+box.querySelectorAll('table').forEach(t=>{t.style.width='100%';t.style.tableLayout='fixed';t.style.fontSize='9px'});
+try{await new Promise(r=>setTimeout(r,400));
+const w=html2pdf().set({margin:5,filename,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#fff',scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:por?'portrait':'landscape'},pagebreak:{mode:['css','legacy'],after:'.pgx'}}).from(box);
+if(asData)return await w.outputPdf('datauristring');await w.save();return true}finally{wrap.remove()}}
+function appHtml(a,o){o=o||{};const e=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;'),D=d=>d?String(d).split('-').reverse().join('-'):'',ref=a.id?String(a.id).slice(-6):'';
+const r=(n,l,v)=>`<tr><td style="width:6%">${n}</td><td style="width:38%;font-weight:600">${l}</td><td>${e(v)||'&nbsp;'}</td></tr>`;
+return`<style>@page{size:A4 portrait;margin:8mm}.apx{font-size:12px;line-height:1.5;color:#000;background:#fff}.apx table{width:100%;border-collapse:collapse}.apx td{border:1px solid #444;padding:6px;text-align:left}</style><div class="apx">
+<div style="text-align:center;margin-bottom:8px"><b style="font-size:16px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>പ്രവേശന അപേക്ഷ / ADMISSION APPLICATION</b><br>${e(o.mad||'')}${o.mno?' · രജി. നമ്പർ: '+e(o.mno):''}</div>
+<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>അപേക്ഷാ നമ്പർ: ${ref||'........'}</span><span>തീയതി: ${D(a.date||a.joined)}</span></div>
+<table>${r(1,'കുട്ടിയുടെ പേരും ഇനീഷ്യലും',a.name)}${r(2,'ആൺ / പെൺ',a.gender)}${r(3,'ജനന തീയതി',D(a.dob))}${r(4,'വീട്ടുപേര്',a.house)}${r(5,'പിതാവിൻ്റെ/മാതാവിൻ്റെ പേര്',a.parent)}${r(6,'രക്ഷിതാവിൻ്റെ പേര്',a.guardian)}${r(7,'രക്ഷിതാവുമായുള്ള ബന്ധം',a.rel)}${r(8,'ജോലി, മേൽവിലാസം',a.job)}${r(9,'ഫോൺ നമ്പർ',a.phone)}${r(10,'ചേർക്കേണ്ട ക്ലാസ്',o.cls)}${r(11,'തിരിച്ചറിയാനുള്ള അടയാളങ്ങൾ',a.mark)}${r(12,'മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി',a.prev)}</table>
+<p style="margin-top:10px">മേൽ നൽകിയ വിവരങ്ങൾ ശരിയാണെന്നും ബോർഡിൻ്റെ നിയമങ്ങൾ പാലിക്കുമെന്നും ഞാൻ ഉറപ്പ് നൽകുന്നു.</p>
+<div style="display:flex;justify-content:space-between;margin-top:18px;align-items:flex-end"><div>${a.gsig?`<img src="${a.gsig}" style="height:50px;display:block">`:'<div style="height:50px"></div>'}<div style="border-top:1px solid #000;padding-top:2px">രക്ഷിതാവിൻ്റെ ഒപ്പ്</div></div><div style="text-align:right">${o.sig?`<img src="${o.sig}" style="height:50px;display:block;margin-left:auto">`:'<div style="height:50px"></div>'}<div style="border-top:1px solid #000;padding-top:2px">സദർ മുഅല്ലിമിൻ്റെ ഒപ്പ്${o.sname?' ('+e(o.sname)+')':''}</div></div></div></div>`}
 
 let db={classes:[]};
 (async()=>{try{db=await api('pData');localStorage.setItem('madrasa_pc',JSON.stringify(db))}catch(e){try{db=JSON.parse(localStorage.getItem('madrasa_pc'))||db}catch(x){}}

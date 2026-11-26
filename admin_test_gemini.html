@@ -2,7 +2,7 @@
 <html lang="ml"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>ടെസ്റ്റ് പാനൽ – Gemini Test</title>
+<title>ടെസ്റ്റ് പാനൽ – Gemini Phase 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
@@ -17,16 +17,20 @@ button,select,input,textarea{font:inherit;color:var(--tx)}
 button{border:1px solid var(--bd);background:var(--sf);padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:600;min-height:44px}
 button.on,button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
 button.sm{padding:4px 9px;font-size:13px;min-height:34px}
+a.wa-btn{display:inline-block;text-decoration:none;background:#1f7a4c;color:#fff;padding:5px 10px;border-radius:10px;font-size:12px;font-weight:600}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 label{display:block;font-size:13px;color:var(--mu);margin-top:8px}
 input,select,textarea{width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);min-height:44px}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
-.row{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:14px 6px;font-size:17px;border-bottom:1px solid var(--bd)}.row b{min-width:38px;text-align:center;padding:5px 0;border-radius:10px;background:var(--ac2);color:var(--ac)}.row.ab b{background:var(--rd);color:#fff}
+.row{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:12px 6px;font-size:16px;border-bottom:1px solid var(--bd);flex-wrap:wrap}.row b{min-width:38px;text-align:center;padding:5px 0;border-radius:10px;background:var(--ac2);color:var(--ac)}.row.ab b{background:var(--rd);color:#fff}
 .row.ab{color:var(--rd);font-weight:600;background:rgba(179,38,30,.08);border-radius:10px}
 .mu{color:var(--mu);font-size:13px}.warn{color:var(--rd)}
 .stat{display:flex;gap:8px;flex-wrap:wrap}.stat div{flex:1;min-width:90px;background:var(--ac2);padding:8px;border-radius:8px}.stat b{font-size:22px;display:block}
 .scroll{overflow-x:auto}
-table{border-collapse:collapse;font-size:12px}th,td{border:1px solid #444;padding:3px 5px;text-align:center;vertical-align:top}
+table{border-collapse:collapse;font-size:11px;width:100%}
+th,td{border:1px solid #444;padding:3px 4px;text-align:center;vertical-align:middle;white-space:normal!important;word-break:break-word!important;overflow-wrap:anywhere!important;overflow:visible!important;height:auto}
+.sig-tilt{display:inline-block;transform:rotate(-14deg) scale(1.1);transform-origin:center;line-height:1}
+.sig-tilt img{height:18px;max-width:44px;display:block;transform:rotate(-14deg) scale(1.15)}
 #print{display:none}
 #pdf_stage{position:fixed;inset:0;z-index:99999;background:#fff;color:#000;overflow:auto;padding:8px;display:none}
 @media print{
@@ -35,12 +39,13 @@ table{border-collapse:collapse;font-size:12px}th,td{border:1px solid #444;paddin
   body>*:not(#print){display:none!important}
   #print{display:block;color:#000;background:#fff;width:100%;box-sizing:border-box}
   #print.p-portrait table{width:100%!important;font-size:10px}
-  #print.p-landscape table{width:100%!important;table-layout:fixed;font-size:9px}
-  #print.p-landscape td,#print.p-landscape th{overflow:hidden;word-break:break-word;padding:2px 1px}
+  #print.p-landscape table{width:100%!important;table-layout:fixed;font-size:8.5px}
+  #print.p-landscape td,#print.p-landscape th{white-space:normal!important;word-break:break-word!important;overflow-wrap:anywhere!important;overflow:visible!important;padding:2px 2px;height:auto}
+  #print.p-landscape .sig-tilt img{height:16px;max-width:36px;transform:rotate(-14deg) scale(1.15)}
   .tc-page-break{page-break-after:always;break-after:page}
 }
 </style></head><body>
-<h1 id="ttl">മദ്രസ മാനേജർ – അഡ്മിൻ (Gemini Test)</h1>
+<h1 id="ttl">മദ്രസ മാനേജർ – അഡ്മിൻ (Gemini Phase 2)</h1>
 <div style="background:#b3261e;color:#fff;padding:10px 14px;border-radius:12px;margin:8px 0;font-weight:600">⚠ ഡ്യൂപ്ലിക്കേഷൻ ടെസ്റ്റ് പാനൽ (Gemini) – ഇതിൽ "എല്ലാ ഡാറ്റയും മായ്ക്കുക" ഉണ്ട്. ഇത് യഥാർത്ഥ Sheet-നെയും ബാധിക്കും.</div>
 <div class="mu" id="sv"></div>
 <div id="gate" class="card"><b>🔒 അഡ്മിൻ പ്രവേശനം</b><label>PIN / പാസ്‌വേഡ്<input id="pin" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')login()"></label><p><button class="pri" onclick="login()">പ്രവേശിക്കുക</button></p></div>
@@ -62,10 +67,29 @@ const cls=id=>db.classes.find(c=>c.id==id)||{name:'-'};
 const stuIn=c=>db.students.filter(s=>s.classId==c&&!s.left).sort((a,b)=>a.no-b.no);
 const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 
+function waLink(phone, text){
+  const digits=String(phone||'').replace(/\D/g,'');
+  if(!digits)return'';
+  const num=digits.length===10?'91'+digits:digits;
+  return 'https://wa.me/'+num+'?text='+encodeURIComponent(text||'');
+}
+function waBtn(phone, label, msg){
+  const href=waLink(phone,msg);
+  if(!href)return'<span class="mu">ഫോൺ ഇല്ല</span>';
+  return `<a class="wa-btn" target="_blank" rel="noopener" href="${href}">${esc(label||'💬 വാട്സ്ആപ്പ്')}</a>`;
+}
+
 function tabs(list){return`<div class="tabs">`+list.map(([k,v])=>`<button class="${tab==k?'on':''}" onclick="tab='${k}';go()">${v}</button>`).join('')+`</div>`}
 function pending(c){const days=Object.keys(db.att).filter(k=>k.startsWith(c+'|')).map(k=>k.split('|')[1]).sort();if(!days.length)return[];
 const out=[];let d=new Date(days[days.length-1]+'T00:00');d.setDate(d.getDate()+1);while(iso(d)<today){if(d.getDay()!=0)out.push(iso(d));d.setDate(d.getDate()+1)}return out}
-function sgn(a){if(!a)return'';if(a.holiday)return a.holiday;const t=db.teachers.find(x=>x.id==a.by)||{};return t.sig?`<img src="${t.sig}" style="height:20px;max-width:100%">`:(t.name||'').slice(0,6)}
+
+function sgn(a){
+  if(!a)return'';
+  if(a.holiday)return `<span class="sig-tilt">${esc(a.holiday)}</span>`;
+  const t=db.teachers.find(x=>x.id==a.by)||{};
+  if(t.sig)return `<span class="sig-tilt"><img src="${t.sig}" alt=""></span>`;
+  return `<span class="sig-tilt">${esc((t.name||'').slice(0,6))}</span>`;
+}
 
 function makeSigPad(canvasId, initialData, onChange){
   const c=$('#'+canvasId); if(!c)return;
@@ -94,7 +118,13 @@ function clrSig(){sigData='';makeSigPad('sgc','',v=>sigData=v)}
 
 let PIN='',db={madrasa:'',mno:'',next:1,yearStart:'',vacationStart:'',sadarId:'',classes:[],teachers:[],students:[],apps:[],att:{}};
 let tab='dash';
-const sel={cls:null,date:today,from:today.slice(0,8)+'01',to:iso(new Date(+today.slice(0,4),+today.slice(5,7),0)),all:true,tcCls:null,tcStu:null,appSig:{}};
+const sel={
+  cls:null,date:today,
+  from:today.slice(0,8)+'01',
+  to:iso(new Date(+today.slice(0,4),+today.slice(5,7),0)),
+  all:true,tcCls:null,tcStu:null,appSig:{},
+  stuQ:'',stuClsFilter:'',callCls:'',bonStu:null,trimBefore:''
+};
 const st=t=>{$('#sv').textContent=t};
 let saving=Promise.resolve();
 
@@ -130,8 +160,9 @@ async function login(p){
   }
   if(!db.classes.find(c=>c.id==sel.cls))sel.cls=db.classes[0]?.id;
   if(!db.classes.find(c=>c.id==sel.tcCls))sel.tcCls=db.classes[0]?.id;
+  if(!sel.callCls)sel.callCls=db.classes[0]?.id||'';
   $('#gate').style.display='none';$('#app').style.display='';
-  if(db.madrasa)$('#ttl').textContent=db.madrasa+' (Gemini Test)';
+  if(db.madrasa)$('#ttl').textContent=db.madrasa+' (Gemini Phase 2)';
   st('');go();
 }
 const reload=()=>saving.then(()=>login(PIN));
@@ -152,7 +183,7 @@ const lbl=(a,b)=>a.slice(0,7)==b.slice(0,7)?MONTHS[+a.slice(5,7)-1]:a+' – '+b;
 const rng=fn=>`<div class="g"><label>തുടക്കം<input type="date" value="${sel.from}" onchange="sel.from=this.value;${fn}()"></label><label>അവസാനം<input type="date" value="${sel.to}" onchange="sel.to=this.value;${fn}()"></label></div><p><button class="sm" onclick="mon(-1,'${fn}')">‹ മുൻ മാസം</button> <button class="sm" onclick="mon(0,'${fn}')">ഈ മാസം</button> <button class="sm" onclick="mon(1,'${fn}')">അടുത്ത മാസം ›</button></p>`;
 function mon(d,fn){const b=d?new Date(sel.from+'T00:00'):new Date(),a=new Date(b.getFullYear(),b.getMonth()+d,1);sel.from=iso(a);sel.to=iso(new Date(a.getFullYear(),a.getMonth()+1,0));window[fn]()}
 
-const isPortraitVar=v=>v=='_tc'||v=='_appf';
+const isPortraitVar=v=>v=='_tc'||v=='_appf'||v=='_bon'||v=='_clslist';
 const btns=(v,n)=>`<p><button class="pri" onclick="pr(window.${v},'${isPortraitVar(v)?'portrait':'landscape'}')">🖨️ പ്രിൻ്റ്</button> <button onclick="pdf('${v}','${n}')">⬇ PDF ഡൗൺലോഡ്</button> <button onclick="pdf('${v}','${n}',1)">☁ Drive-ലേക്ക്</button></p>`;
 const regList=()=>db.students.filter(s=>sel.all||(s.joined>=sel.from&&s.joined<=sel.to));
 const regF=()=>`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto" ${sel.all?'checked':''} onchange="sel.all=this.checked;reg()"> എല്ലാ കുട്ടികളും (തീയതി ഫിൽട്ടർ ഇല്ലാതെ)</label>${sel.all?'':rng('reg')}`;
@@ -174,7 +205,7 @@ async function pdf(v,name,up){
   stage.innerHTML=`<div id="pdf_box" style="width:${portrait?'720px':'1080px'};margin:0 auto;background:#fff;color:#000;padding:8px;box-sizing:border-box">${html}</div>`;
   const box=$('#pdf_box');
   if(!portrait){
-    box.querySelectorAll('table').forEach(t=>{t.style.width='100%';t.style.tableLayout='fixed';t.style.fontSize='9px'});
+    box.querySelectorAll('table').forEach(t=>{t.style.width='100%';t.style.tableLayout='fixed';t.style.fontSize='8.5px'});
   }
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   try{
@@ -213,11 +244,21 @@ let sub={st:'apps',te:'mreg'};
 function admin_(){
   const T=[['dash','🏠 ഡാഷ്ബോർഡ്'],['st','👦 വിദ്യാർത്ഥികൾ'],['te','👳 അധ്യാപകർ'],['set','⚙️ ക്രമീകരണം']];
   const S={
-    st:[['apps','അപേക്ഷകൾ ('+db.apps.length+')'],['stu','കുട്ടികൾ'],['tc','TC'],['reg','അഡ്മിഷൻ രജിസ്റ്റർ'],['attp','അറ്റൻഡൻസ് രജിസ്റ്റർ'],['promo','പ്രൊമോഷൻ']],
+    st:[
+      ['apps','അപേക്ഷകൾ ('+db.apps.length+')'],
+      ['stu','കുട്ടികൾ'],
+      ['tc','TC'],
+      ['calls','വിളിക്കേണ്ട ലിസ്റ്റ്'],
+      ['clsprint','ക്ലാസ് ലിസ്റ്റ്'],
+      ['bonafide','പഠിക്കുന്നു സർട്ടിഫിക്കറ്റ്'],
+      ['reg','അഡ്മിഷൻ രജിസ്റ്റർ'],
+      ['attp','അറ്റൻഡൻസ് രജിസ്റ്റർ'],
+      ['promo','പ്രൊമോഷൻ']
+    ],
     te:[['mreg','മുഅല്ലിം രജിസ്റ്റർ'],['sig','സിഗ്നേച്ചർ രജിസ്റ്റർ']]
   };
   $('#app').innerHTML='<p><button class="sm" onclick="reload()">🔄 പുതുക്കുക</button> <button class="sm" onclick="logout()">🔒 പുറത്തുകടക്കുക</button></p>'+tabs(T)+(S[tab]?'<div class="tabs">'+S[tab].map(([k,v])=>`<button class="sm ${sub[tab]==k?'on':''}" onclick="sub['${tab}']='${k}';go()">${v}</button>`).join('')+'</div>':'')+'<div id="pg"></div>';
-  ({dash,apps,stu,tc:tcTab,reg,attp,promo,mreg,sig,set})[S[tab]?sub[tab]:tab]();
+  ({dash,apps,stu,tc:tcTab,calls:callsTab,clsprint:clsPrintTab,bonafide:bonafideTab,reg,attp,promo,mreg,sig,set})[S[tab]?sub[tab]:tab]();
 }
 
 function dash(){
@@ -229,14 +270,15 @@ function dash(){
     stuIn(c.id).forEach(s=>{if(s.joined<=ks[0]&&ks.every(d=>db.att[c.id+'|'+d].absent.includes(s.no)))lng.push(s.no+'. '+s.name+' ('+c.name+')')});
   });
   const lngH=lng.length?'<h2>10 പ്രവൃത്തി ദിവസമായി വരാത്തവർ</h2><div class="card">'+lng.map(x=>'<div class="row">'+x+'</div>').join('')+'<p class="mu">വിടുതൽ ചെയ്യേണ്ടതുണ്ടോ എന്ന് നോക്കുക (കുട്ടികൾ ടാബ്).</p></div>':'';
-  const rows=db.classes.map(c=>{const a=db.att[c.id+'|'+t],n=stuIn(c.id).length;return`<div class="row"><span>${c.name} · ${cls(c.id).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>${a?a.holiday?'അവധി: '+a.holiday:(n-a.absent.length)+' / '+n+' ഹാജർ':'<i class="mu">ഇന്ന് ബാക്കി</i>'}</span></div>`}).join('');
-  $('#pg').innerHTML=`<div class="stat"><div><b>${db.students.filter(s=>!s.left).length}</b>ആകെ കുട്ടികൾ</div><div><b>${db.apps.length}</b>പുതിയ അപേക്ഷ</div><div><b>${pend.length}</b>ഹാജർ ബാക്കിയുള്ള ക്ലാസ്</div></div><h2>ഇന്ന് (${t})</h2><div class="card">${rows||'ക്ലാസുകളില്ല'}</div>${lngH}${pend.map(x=>`<p class="warn">${x.c.name}: ${x.p.length} ദിവസം ബാക്കി</p>`).join('')}`;
+  const rows=db.classes.map(c=>{const a=db.att[c.id+'|'+t],n=stuIn(c.id).length;return`<div class="row"><span>${esc(c.name)} · ${cls(c.id).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>${a?a.holiday?'അവധി: '+esc(a.holiday):(n-a.absent.length)+' / '+n+' ഹാജർ':'<i class="mu">ഇന്ന് ബാക്കി</i>'}</span></div>`}).join('');
+  $('#pg').innerHTML=`<div class="stat"><div><b>${db.students.filter(s=>!s.left).length}</b>ആകെ കുട്ടികൾ</div><div><b>${db.apps.length}</b>പുതിയ അപേക്ഷ</div><div><b>${pend.length}</b>ഹാജർ ബാക്കിയുള്ള ക്ലാസ്</div></div><h2>ഇന്ന് (${t})</h2><div class="card">${rows||'ക്ലാസുകളില്ല'}</div>${lngH}${pend.map(x=>`<p class="warn">${esc(x.c.name)}: ${x.p.length} ദിവസം ബാക്കി</p>`).join('')}`;
 }
 
 function apps(){
   $('#pg').innerHTML=db.apps.length?db.apps.map(a=>{
     const sadar=(db.teachers||[]).find(t=>t.id==db.sadarId)||{};
     const curSadarSig=sel.appSig[a.id]!=null?sel.appSig[a.id]:(sadar.sig||'');
+    const waMsg=`അസ്സലാമു അലൈക്കും. ${db.madrasa||'മദ്രസ'}-ലേക്ക് ${a.name} എന്ന കുട്ടിയുടെ പ്രവേശന അപേക്ഷ (${a.refNo||''}) ലഭിച്ചിട്ടുണ്ട്.`;
     return `<div class="card">
       <b>${esc(a.name)}</b> (${esc(a.gender||'')}) · ${esc(a.dob)} ${a.refNo?'· <span class="mu">Ref: '+esc(a.refNo)+'</span>':''}
       <div class="mu">${esc(a.guardian||'')} · ${esc(a.phone||'')} · ${esc(cls(a.classId).name)} · അപേക്ഷ: ${esc(a.date)}</div>
@@ -250,6 +292,7 @@ function apps(){
       <p>
         <button class="pri sm" onclick="approve(${a.id})">അംഗീകരിക്കുക</button>
         <button class="sm" onclick="previewApp(${a.id})">🖨️ പ്രിന്റ് / PDF (Portrait)</button>
+        ${waBtn(a.phone,'💬 വാട്സ്ആപ്പ്',waMsg)}
         <button class="sm" onclick="rej(${a.id})">നിരസിക്കുക</button>
       </p>
     </div>`;
@@ -318,9 +361,40 @@ function approve(id){
 }
 function rej(id){if(confirm('നിരസിക്കട്ടെ?')){db.apps=db.apps.filter(x=>x.id!=id);delApp(id);save();admin_()}}
 
+/* കുട്ടികൾ + സെർച്ച് + വാട്സ്ആപ്പ് */
 function stu(){
+  const q=(sel.stuQ||'').toLowerCase().trim();
+  const cFilt=sel.stuClsFilter||'';
+  const filtered=db.students
+    .filter(s=>{
+      if(cFilt && String(s.classId)!==String(cFilt))return false;
+      if(!q)return true;
+      const hay=[s.no,s.name,s.house,s.guardian,s.parent,s.phone,cls(s.classId).name].join(' ').toLowerCase();
+      return hay.includes(q);
+    })
+    .sort((a,b)=>a.no-b.no);
+
   $('#pg').innerHTML=`<div class="card"><b>കുട്ടിയെ ചേർക്കുക (പഴയ കുട്ടികൾക്കും)</b><div class="g">${f('s_no','പ്രവേശന നമ്പർ','number',db.next)}${f('s_j','ചേർന്ന തീയതി','date',today)}</div>${f('s_name','പേരും ഇനീഷ്യലും')}<div class="g">${f('s_house','വീട്ടുപേര്')}${f('s_dob','ജനന തീയതി','date')}</div>${f('s_p','പിതാവ്/മാതാവ്')}${f('s_gu','രക്ഷിതാവ്')}<div class="g">${f('s_ph','ഫോൺ','tel')}${f('s_rel','ബന്ധം')}</div>${f('s_job','ജോലി, മേൽവിലാസം')}${f('s_mark','തിരിച്ചറിയാനുള്ള അടയാളം')}${f('s_prev','മുമ്പ് പഠിച്ച മദ്രസ, TC നമ്പർ, തീയതി')}${f('s_pn','മുൻ നമ്പർ')}${db.classes.length?'':'<p class="warn">ആദ്യം ക്രമീകരണത്തിൽ ക്ലാസ് ഉണ്ടാക്കുക.</p>'}<label>ക്ലാസ്<select id="s_cls">${opts(db.classes)}</select></label><p><button class="pri" onclick="addStu()">ചേർക്കുക</button></p></div>
-<h2>ലിസ്റ്റ്</h2>${db.students.sort((a,b)=>a.no-b.no).map(s=>`<div class="row" style="${s.left?'opacity:.55':''}"><span>${s.no}. ${esc(s.name)} <span class="mu">${esc(cls(s.classId).name)}${s.left?' · '+esc(s.left.how||'വിട്ടു')+' '+esc(s.left.date):''}</span></span>${s.left?`<button class="sm" onclick="readmit(${s.no})">↩ തിരികെ ചേർക്കുക</button> <button class="sm" onclick="openTcForStu(${s.no})">📄 TC</button>`:`<button class="sm" onclick="leave(${s.no})">വിടുതൽ</button>`}</div>`).join('')||'<p class="mu">കുട്ടികളില്ല.</p>'}`;
+<h2>ലിസ്റ്റ് (${filtered.length} / ${db.students.length})</h2>
+<div class="card">
+  <div class="g">
+    <label>തിരയുക (പേര്, നമ്പർ, ഫോൺ, വീട്ടുപേര്)<input id="stu_search" type="search" value="${esc(sel.stuQ)}" placeholder="പേരോ നമ്പറോ ടൈപ്പ് ചെയ്യുക…" oninput="sel.stuQ=this.value;stu()"></label>
+    <label>ക്ലാസ് ഫിൽട്ടർ<select onchange="sel.stuClsFilter=this.value;stu()"><option value="">എല്ലാ ക്ലാസുകളും</option>${opts(db.classes,cFilt)}</select></label>
+  </div>
+  ${filtered.map(s=>{
+    const msg=`അസ്സലാമു അലൈക്കും. ${db.madrasa||'മദ്രസ'}-ൽ നിന്ന് (${cls(s.classId).name}) ${s.name} എന്ന കുട്ടിയുടെ രക്ഷിതാവിനുള്ള അറിയിപ്പ്: `;
+    return `<div class="row" style="${s.left?'opacity:.65':''}">
+      <div>
+        <b>${s.no}</b> <span>${esc(s.name)}</span>
+        <div class="mu">${esc(cls(s.classId).name)} · ${esc(s.guardian||s.parent||'')} · ${esc(s.phone||'ഫോൺ ഇല്ല')}${s.left?' · <span class="warn">'+(s.left.how||'വിട്ടു')+' '+esc(s.left.date)+'</span>':''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        ${waBtn(s.phone,'💬 WA',msg)}
+        ${s.left?`<button class="sm" onclick="readmit(${s.no})">↩ തിരികെ ചേർക്കുക</button> <button class="sm" onclick="openTcForStu(${s.no})">📄 TC</button>`:`<button class="sm" onclick="leave(${s.no})">വിടുതൽ</button>`}
+      </div>
+    </div>`;
+  }).join('')||'<p class="mu">കുട്ടികളില്ല.</p>'}
+</div>`;
 }
 function addStu(){
   if(!db.classes.length)return alert('ആദ്യം ക്രമീകരണത്തിൽ ക്ലാസ് ഉണ്ടാക്കുക');
@@ -345,15 +419,122 @@ function leave(no){
   if(h=='1')openTcForStu(no);else stu();
 }
 
+/* ---------- ഘട്ടം 2: വരാത്തവരെ വിളിക്കാനുള്ള ലിസ്റ്റ് ---------- */
+function callsTab(){
+  const cId=sel.callCls||db.classes[0]?.id||'';
+  const attDates=Object.keys(db.att)
+    .filter(k=>k.startsWith(cId+'|')&&!db.att[k].holiday)
+    .map(k=>k.split('|')[1])
+    .sort();
+  const last5=attDates.slice(-5);
+  const last10=attDates.slice(-10);
+
+  const list=stuIn(cId).map(s=>{
+    const abLast=last5.filter(d=>db.att[cId+'|'+d]&&(db.att[cId+'|'+d].absent||[]).includes(s.no)).length;
+    const ab10=last10.length===10&&s.joined<=last10[0]&&last10.every(d=>(db.att[cId+'|'+d].absent||[]).includes(s.no));
+    const latestRec=attDates.length?db.att[cId+'|'+attDates[attDates.length-1]]:null;
+    const absLatest=latestRec&&(latestRec.absent||[]).includes(s.no);
+    return {s,abLast,ab10,absLatest};
+  }).filter(x=>x.abLast>0||x.ab10||x.absLatest);
+
+  $('#pg').innerHTML=`<div class="card"><b>വരാത്തവരെ വിളിക്കാനുള്ള ലിസ്റ്റ്</b>
+    <label>ക്ലാസ്<select onchange="sel.callCls=this.value;callsTab()">${opts(db.classes,cId)}</select></label>
+    <p class="mu">അവസാന ഹാജർ ദിവസങ്ങളിൽ ഹാജരില്ലാത്തവരെയും തുടർച്ചയായി വരാത്തവരെയും ഇവിടെ കാണാം.</p>
+    ${list.length?list.map(({s,abLast,ab10,absLatest})=>{
+      const msg=`അസ്സലാമു അലൈക്കും. ${db.madrasa||'മദ്രസ'}-ൽ നിന്ന് (${cls(cId).name}) ${s.name} എന്ന കുട്ടി മദ്രസയിൽ വരാത്തത് ശ്രദ്ധയിൽപ്പെട്ടതിനാലാണ് വിളിക്കുന്നത്.`;
+      return `<div class="row ${ab10?'ab':''}">
+        <div>
+          <b>${s.no}</b> <span>${esc(s.name)}</span>
+          <div class="mu">രക്ഷിതാവ്: ${esc(s.guardian||s.parent||'-')} · ഫോൺ: <b>${esc(s.phone||'ഇല്ല')}</b></div>
+          <div class="${ab10?'warn':'mu'}">${ab10?'⚠ തുടർച്ചയായി 10 പ്രവൃത്തി ദിവസം വന്നിട്ടില്ല':''}${absLatest?' (അവസാന ദിവസം ഹാജരില്ല)':''} · സമീപ ദിവസങ്ങളിൽ ${abLast} ദിവസം ഹാജരില്ല</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${s.phone?`<a class="sm" style="text-decoration:none;border:1px solid var(--bd);padding:6px 10px;border-radius:10px" href="tel:${esc(s.phone)}">📞 വിളിക്കുക</a>`:''}
+          ${waBtn(s.phone,'💬 വാട്സ്ആപ്പ്',msg)}
+        </div>
+      </div>`;
+    }).join(''):'<p class="mu">ഈ ക്ലാസിൽ അടുത്തിടെ ഹാജരില്ലാത്ത കുട്ടികളൊന്നുമില്ല.</p>'}
+  </div>`;
+}
+
+/* ---------- ഘട്ടം 2: ക്ലാസ് ലിസ്റ്റ് പ്രിന്റ് / PDF ---------- */
+function clsPrintTab(){
+  const cId=sel.cls||db.classes[0]?.id||'';
+  const list=stuIn(cId);
+  const cObj=cls(cId);
+  const html=`<div style="font-family:'Noto Sans Malayalam',sans-serif;color:#000">
+    <div style="text-align:center;margin-bottom:8px">
+      <b style="font-size:15px">ISLAMIC EDUCATIONAL BOARD</b><br>
+      <b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br>
+      <b>ക്ലാസ് വിദ്യാർത്ഥി ലിസ്റ്റ് (CLASS STUDENT LIST)</b><br>
+      <span style="font-size:12px">${esc(db.madrasa||'')} ${db.mno?'('+esc(db.mno)+')':''} · ക്ലാസ്: <b>${esc(cObj.name)}</b> · തീയതി: ${esc(today)}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr><th style="width:10%">നമ്പർ</th><th style="width:28%">പേര്</th><th style="width:22%">വീട്ടുപേര്</th><th style="width:22%">രക്ഷിതാവ്</th><th style="width:18%">ഫോൺ</th></tr></thead>
+      <tbody>${list.map(s=>`<tr><td>${s.no}</td><td style="text-align:left">${esc(s.name)}</td><td style="text-align:left">${esc(s.house||'')}</td><td style="text-align:left">${esc(s.guardian||s.parent||'')}</td><td>${esc(s.phone||'')}</td></tr>`).join('')||'<tr><td colspan="5">കുട്ടികളില്ല</td></tr>'}</tbody>
+    </table>
+    <p style="font-size:11px;margin-top:12px">ആകെ കുട്ടികൾ: <b>${list.length}</b> &nbsp;&nbsp;|&nbsp;&nbsp; ക്ലാസ് മുഅല്ലിം: ................ &nbsp;&nbsp;|&nbsp;&nbsp; സദർ മുഅല്ലിം: ................</p>
+  </div>`;
+  window._clslist=html;
+  $('#pg').innerHTML=`<div class="card"><b>ക്ലാസ് ലിസ്റ്റ് പ്രിന്റ് / PDF</b>
+    <label>ക്ലാസ് തിരഞ്ഞെടുക്കുക<select onchange="sel.cls=this.value;clsPrintTab()">${opts(db.classes,cId)}</select></label>
+    ${btns('_clslist','class-list-'+(cObj.name||'class'))}
+    <div class="scroll card">${html}</div>
+  </div>`;
+}
+
+/* ---------- ഘട്ടം 2: പഠിക്കുന്നു എന്ന സർട്ടിഫിക്കറ്റ് (Bonafide) ---------- */
+function bonafideTab(){
+  const active=db.students.filter(s=>!s.left).sort((a,b)=>a.no-b.no);
+  const curId=sel.bonStu||active[0]?.no||'';
+  const s=active.find(x=>x.no==curId)||active[0];
+  if(!s){$('#pg').innerHTML='<p class="mu">നിലവിൽ പഠിക്കുന്ന കുട്ടികളില്ല.</p>';return}
+  sel.bonStu=s.no;
+  const sadar=(db.teachers||[]).find(t=>t.id==db.sadarId)||{};
+  const html=`<div style="font-family:'Noto Sans Malayalam',sans-serif;color:#000;line-height:1.7;padding:12px;border:2px solid #222;border-radius:8px">
+    <div style="text-align:center;border-bottom:1px solid #444;padding-bottom:8px;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:700">ISLAMIC EDUCATIONAL BOARD</div>
+      <div style="font-size:13px;font-weight:600">സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</div>
+      <div style="font-size:17px;font-weight:700;margin-top:4px">${esc(db.madrasa||'മദ്രസ')}</div>
+      <div style="font-size:12px">${db.mno?'രജിസ്റ്റർ / അംഗീകാര നമ്പർ: '+esc(db.mno):''}</div>
+    </div>
+    <div style="text-align:center;font-size:15px;font-weight:700;text-decoration:underline;margin-bottom:14px">പഠന സാക്ഷ്യപത്രം (STUDY / BONAFIDE CERTIFICATE)</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:12px">
+      <span>പ്രവേശന നമ്പർ: <b>${esc(s.no)}</b></span>
+      <span>തീയതി: <b>${esc(D(today))}</b></span>
+    </div>
+    <p style="font-size:13px;text-align:justify">
+      <b>${esc(s.name)}</b> (വീട്ടുപേര്: <b>${esc(s.house||'-')}</b>, രക്ഷിതാവ്: <b>${esc(s.guardian||s.parent||'-')}</b>, ജനന തീയതി: <b>${esc(D(s.dob)||'-')}</b>) എന്ന കുട്ടി <b>${esc(D(s.joined)||'-')}</b> മുതൽ ഈ മദ്രസയിൽ ചേർന്ന് നിലവിൽ <b>${esc(cls(s.classId).name)}</b> ക്ലാസിൽ പഠിച്ചുവരുന്നുണ്ടെന്ന് ഇതിനാൽ സാക്ഷ്യപ്പെടുത്തുന്നു.
+    </p>
+    <p style="font-size:12px;color:#333">കുട്ടിയുടെ സ്വഭാവം തൃപ്തികരമാണ്.</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px;font-size:12px">
+      <div>മദ്രസ സീൽ (Seal)</div>
+      <div style="text-align:right">
+        ${sadar.sig?`<img src="${sadar.sig}" style="height:44px;display:block;margin-left:auto"><br>`:'<br><br>'}
+        <b>${esc(sadar.name||'സദർ മുഅല്ലിം')}</b><br>സദർ മുഅല്ലിം
+      </div>
+    </div>
+  </div>`;
+  window._bon=html;
+  $('#pg').innerHTML=`<div class="card"><b>പഠിക്കുന്നു എന്ന സർട്ടിഫിക്കറ്റ് (Bonafide)</b>
+    <label>കുട്ടിയെ തിരഞ്ഞെടുക്കുക<select onchange="sel.bonStu=+this.value;bonafideTab()">${active.map(x=>`<option value="${x.no}" ${x.no==s.no?'selected':''}>${x.no}. ${esc(x.name)} (${esc(cls(x.classId).name)})</option>`).join('')}</select></label>
+    ${btns('_bon','bonafide-'+s.no)}
+    <div class="card">${html}</div>
+  </div>`;
+}
+
 /* പ്രിൻ്റ് & രജിസ്റ്ററുകൾ */
 function reg(){
   const H=['പ്രവേശന നമ്പർ','പേര്, ഇനീഷ്യൽ','വീട്ടുപേര്','പിതാവ്/മാതാവ്','രക്ഷിതാവ്, ഫോൺ','ബന്ധം','ജോലി, മേൽവിലാസം','ജനന തീയതി','ചേർന്ന ക്ലാസ്','ചേർന്ന തീയതി','അടയാളം','മുമ്പ് പഠിച്ച മദ്രസ/TC','മുൻ നമ്പർ','വിട്ട ക്ലാസ്','വിട്ട തീയതി','വിടാനുള്ള കാരണം','ചേരുന്ന മദ്രസ','കൊടുത്ത TC','സദറിൻ്റെ ഒപ്പ്','റിമാർക്സ്'];
   const L=regList().sort((a,b)=>a.no-b.no);
-  const rows=L.map(s=>[s.no,s.name,s.house,s.parent||'',(s.guardian||'')+' '+(s.phone||''),s.rel,s.job,s.dob,cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,s.joined,s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',s.left?.date||'',s.left?.reason||'',s.left?.to||'',s.left?.tc||'','',s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):'']);
+  const rows=L.map(s=>{
+    const sSigCell=s.sadarSig?`<span class="sig-tilt"><img src="${s.sadarSig}" alt=""></span>`:'';
+    return [s.no,s.name,s.house,s.parent||'',(s.guardian||'')+' '+(s.phone||''),s.rel,s.job,s.dob,cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,s.joined,s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',s.left?.date||'',s.left?.reason||'',s.left?.to||'',s.left?.tc||'',sSigCell,s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):''];
+  });
   const thead=`<thead><tr>${H.map((h,i)=>`<th>${h}<br>${i+1}</th>`).join('')}</tr></thead>`;
-  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>വിദ്യാർത്ഥി പ്രവേശന രജിസ്റ്റർ (ADMISSION REGISTER)</b> ${db.madrasa?'– '+esc(db.madrasa):''}</div><table style="width:100%;font-size:9px">${thead}<tbody>${rows.map((r,ri)=>`<tr style="height:34px;${L[ri].left?'opacity:.5;background:#eee':''}">${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>വിദ്യാർത്ഥി പ്രവേശന രജിസ്റ്റർ (ADMISSION REGISTER)</b> ${db.madrasa?'– '+esc(db.madrasa):''}</div><table style="width:100%;font-size:8.5px">${thead}<tbody>${rows.map((r,ri)=>`<tr style="${L[ri].left?'opacity:.65;background:#f4f4f4':''}">${r.map(c=>`<td>${c??''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   window._reg=tbl;
-  $('#pg').innerHTML=`<p class="mu">20 കള്ളികളുടെ ക്രമത്തിൽ. ഹിജ്രി തീയതി ഈ മാതൃകയിൽ ഇല്ല.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl.replace('style="width:100%;font-size:9px"','')}</div>`;
+  $('#pg').innerHTML=`<p class="mu">20 കള്ളികളുടെ ക്രമത്തിൽ. ഏത് കള്ളിയിലും എഴുത്ത് താഴോട്ട് വലുപ്പം കൂടും; അടുത്ത കള്ളിയിലേക്ക് കയറില്ല.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl}</div>`;
 }
 
 function attp(){
@@ -369,10 +550,10 @@ function attp(){
   const avg=(p,w)=>w?(p/w).toFixed(1):'-';
   const op=db.students.filter(s=>clsOn(s,ms)==c&&s.joined<ms&&(!s.left||s.left.date>=ms)).length,nw=db.students.filter(s=>clsOn(s,me)==c&&s.joined>=ms&&s.joined<=me).length,lf=db.students.filter(s=>s.classId==c&&s.left&&s.left.date>=ms&&s.left.date<=me).length;
   const N=n+6;
-  const body=stList.map((s,i)=>`<tr><td>${s.no}</td><td style="text-align:left;white-space:nowrap">${esc(s.name)}</td>${days.map(d=>{const a=rec(d);return`<td style="${sun(d)||a?.holiday?'background:#ddd':''}">${sun(d)||!a||a.holiday||s.joined>d||clsOn(s,d)!=c?'':a.absent.includes(s.no)?'A':'×'}</td>`}).join('')}<td>${pm[i]}</td><td>${pp[i]}</td><td>${pm[i]+pp[i]}</td><td></td></tr>`).join('');
+  const body=stList.map((s,i)=>`<tr><td>${s.no}</td><td style="text-align:left">${esc(s.name)}</td>${days.map(d=>{const a=rec(d);return`<td style="${sun(d)||a?.holiday?'background:#ddd':''}">${sun(d)||!a||a.holiday||s.joined>d||clsOn(s,d)!=c?'':a.absent.includes(s.no)?'A':'×'}</td>`}).join('')}<td>${pm[i]}</td><td>${pp[i]}</td><td>${pm[i]+pp[i]}</td><td></td></tr>`).join('');
   const tot=days.map(d=>{const a=rec(d);return`<td>${a&&!a.holiday?stList.filter(s=>s.joined<=d&&clsOn(s,d)==c).length-a.absent.length:''}</td>`}).join('');
-  const sg=days.map(d=>{const a=rec(d);return`<td style="height:26px;font-size:8px">${sgn(a)}</td>`}).join('');
-  const tbl=`<table style="width:100%"><colgroup><col style="width:4.5%"><col style="width:16%">${days.map(()=>'<col>').join('')}<col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:6%"></colgroup><thead><tr><td colspan="${N}" style="text-align:center;border:none"><b style="font-size:15px">ISLAMIC EDUCATIONAL BOARD</b><br>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്<br><b>സ്റ്റുഡൻ്റ്സ് അറ്റൻഡൻസ് രജിസ്റ്റർ (STUDENTS ATTENDANCE REGISTER)</b><div style="display:flex;justify-content:space-between;margin-top:6px"><span>മദ്രസ: ${esc(db.madrasa||'.........')}</span><span>നമ്പർ: ${esc(db.mno||'.........')}</span><span>ക്ലാസ്: ${esc(cls(c).name)}</span><span>${cls(c).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>മാസം: ${lbl(ms,me)}</span><span>വർഷം: ${y}</span></div></td></tr><tr><th>നമ്പർ</th><th>പേര്</th>${days.map(d=>`<th>${+d.slice(8)}</th>`).join('')}<th>ഈ മാസം</th><th>മുൻ മാസം</th><th>ആകെ</th><th>റിമാർക്സ്</th></tr></thead><tbody>${body}<tr><td colspan="2">ആകെ ഹാജർ</td>${tot}<td>${wM}</td><td>${wP}</td><td>${wT}</td><td style="font-size:8px">പ്രവൃത്തി ദിവസം</td></tr><tr><td colspan="2">മുഅല്ലിമിൻ്റെ ഒപ്പ്</td>${sg}<td>${avg(PM,wM)}</td><td>${avg(PP,wP)}</td><td>${avg(PT,wT)}</td><td style="font-size:8px">ശരാശരി</td></tr></tbody><tfoot><tr><td colspan="${N}" style="text-align:left;border:none;padding-top:6px"><div style="margin-bottom:4px">മാസാരംഭത്തിൽ കുട്ടികൾ: <b>${op}</b> &nbsp;|&nbsp; പുതുതായി ചേർന്നവർ: <b>${nw}</b> &nbsp;|&nbsp; ഈ മാസം വിട്ടവർ: <b>${lf}</b> &nbsp;|&nbsp; മാസാവസാനത്തിൽ: <b>${op+nw-lf}</b></div><div style="display:flex;justify-content:space-between;margin-top:14px;font-size:11px"><span>ക്ലാസ് മുഅല്ലിം: ................</span><span>സദർ മുഅല്ലിം: ................</span><span>മുഫത്തീശ്: ................</span></div></td></tr></tfoot></table>`;
+  const sg=days.map(d=>{const a=rec(d);return`<td style="min-height:28px;font-size:8px">${sgn(a)}</td>`}).join('');
+  const tbl=`<table style="width:100%"><colgroup><col style="width:4.5%"><col style="width:15%">${days.map(()=>'<col>').join('')}<col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:6%"></colgroup><thead><tr><td colspan="${N}" style="text-align:center;border:none"><b style="font-size:15px">ISLAMIC EDUCATIONAL BOARD</b><br>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്<br><b>സ്റ്റുഡൻ്റ്സ് അറ്റൻഡൻസ് രജിസ്റ്റർ (STUDENTS ATTENDANCE REGISTER)</b><div style="display:flex;justify-content:space-between;flex-wrap:wrap;margin-top:6px"><span>മദ്രസ: ${esc(db.madrasa||'.........')}</span><span>നമ്പർ: ${esc(db.mno||'.........')}</span><span>ക്ലാസ്: ${esc(cls(c).name)}</span><span>${cls(c).sess=='1'?'സെക്ഷൻ 1':'സെക്ഷൻ 2'}</span><span>മാസം: ${lbl(ms,me)}</span><span>വർഷം: ${y}</span></div></td></tr><tr><th>നമ്പർ</th><th>പേര്</th>${days.map(d=>`<th>${+d.slice(8)}</th>`).join('')}<th>ഈ മാസം</th><th>മുൻ മാസം</th><th>ആകെ</th><th>റിമാർക്സ്</th></tr></thead><tbody>${body}<tr><td colspan="2">ആകെ ഹാജർ</td>${tot}<td>${wM}</td><td>${wP}</td><td>${wT}</td><td style="font-size:8px">പ്രവൃത്തി ദിവസം</td></tr><tr><td colspan="2">മുഅല്ലിമിൻ്റെ ഒപ്പ്</td>${sg}<td>${avg(PM,wM)}</td><td>${avg(PP,wP)}</td><td>${avg(PT,wT)}</td><td style="font-size:8px">ശരാശരി</td></tr></tbody><tfoot><tr><td colspan="${N}" style="text-align:left;border:none;padding-top:6px"><div style="margin-bottom:4px">മാസാരംഭത്തിൽ കുട്ടികൾ: <b>${op}</b> &nbsp;|&nbsp; പുതുതായി ചേർന്നവർ: <b>${nw}</b> &nbsp;|&nbsp; ഈ മാസം വിട്ടവർ: <b>${lf}</b> &nbsp;|&nbsp; മാസാവസാനത്തിൽ: <b>${op+nw-lf}</b></div><div style="display:flex;justify-content:space-between;margin-top:14px;font-size:11px"><span>ക്ലാസ് മുഅല്ലിം: ................</span><span>സദർ മുഅല്ലിം: ................</span><span>മുഫത്തീശ്: ................</span></div></td></tr></tfoot></table>`;
   window._att=tbl;
   $('#pg').innerHTML=`<div class="g"><label>ക്ലാസ്<select onchange="sel.cls=this.value;attp()">${opts(db.classes,c)}</select></label></div>${rng('attp')}<div></div><p class="mu">മദ്രസയുടെ പേരും നമ്പറും ക്രമീകരണത്തിൽ നൽകുക. ("മുൻ മാസം" ${esc(yrStartBound)} മുതൽ കണക്കാക്കുന്നു)</p>${btns('_att','attendance-register')}<div class="scroll card">${tbl}</div>`;
 }
@@ -384,12 +565,12 @@ function mreg(){
   const t=window._et?db.teachers.find(x=>x.id==window._et):{},v=k=>t[k]||'';
   const H=['ക്രമ നമ്പർ','പേരും ഇനീഷ്യലും, വിലാസം','പിതാവിൻ്റെ പേര്','ജനന തീയതി','അടയാളം','രക്തഗ്രൂപ്പ്','ശമ്പളം','MSR നമ്പർ','ആകെ സർവീസ','നിയമന തീയതി, മതപരം, ഭൗതികം'];
   const H2=['സേവനം നിർത്തിയ തീയതി','CL അല്ലാത്ത ലീവ്','വിടാനുള്ള കാരണം','റിമാർക്സ്'];
-  const rows=db.teachers.map((x,i)=>`<tr style="height:60px"><td>${i+1}</td><td>${esc(x.name||'')}</td><td>${esc(x.father||'')}</td><td>${esc(x.dob||'')}</td><td>${esc(x.mark||'')}</td><td>${esc(x.blood||'')}</td><td>${esc(x.salary||'')}</td><td>${esc(x.msr||'')}</td><td>${svc(x)}</td><td>${esc(x.joined||'')}<br>${esc(x.rel||'')}<br>${esc(x.mat||'')}</td>${COURSES.map((_,j)=>`<td>${esc((x.cr||[])[j]||'')}</td>`).join('')}<td>${esc(x.stop||'')}</td><td>${esc(x.leaves||'')}</td><td>${esc(x.why||'')}</td><td>${esc(x.rem||'')}</td></tr>`).join('');
-  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>മുഅല്ലിം അഡ്മിഷൻ രജിസ്റ്റർ (MUALLIM ADMISSION REGISTER)</b> ${db.madrasa?'– '+esc(db.madrasa):''}</div><table style="width:100%;font-size:9px"><tr>${H.map((h,i)=>`<th rowspan="2">${h}<br>${i+1}</th>`).join('')}<th colspan="10">11. കോഴ്സുകൾ, സർട്ടിഫിക്കറ്റ് നമ്പർ</th>${H2.map((h,i)=>`<th rowspan="2">${h}<br>${12+i}</th>`).join('')}</tr><tr>${COURSES.map(c=>`<th>${c}</th>`).join('')}</tr>${rows}</table><p style="font-size:11px">സദർ മുഅല്ലിം: ........... മുഫത്തിഷ്: ...........</p>`;
+  const rows=db.teachers.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name||'')}</td><td>${esc(x.father||'')}</td><td>${esc(x.dob||'')}</td><td>${esc(x.mark||'')}</td><td>${esc(x.blood||'')}</td><td>${esc(x.salary||'')}</td><td>${esc(x.msr||'')}</td><td>${svc(x)}</td><td>${esc(x.joined||'')}<br>${esc(x.rel||'')}<br>${esc(x.mat||'')}</td>${COURSES.map((_,j)=>`<td>${esc((x.cr||[])[j]||'')}</td>`).join('')}<td>${esc(x.stop||'')}</td><td>${esc(x.leaves||'')}</td><td>${esc(x.why||'')}</td><td>${esc(x.rem||'')}</td></tr>`).join('');
+  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>മുഅല്ലിം അഡ്മിഷൻ രജിസ്റ്റർ (MUALLIM ADMISSION REGISTER)</b> ${db.madrasa?'– '+esc(db.madrasa):''}</div><table style="width:100%;font-size:8.5px"><tr>${H.map((h,i)=>`<th rowspan="2">${h}<br>${i+1}</th>`).join('')}<th colspan="10">11. കോഴ്സുകൾ, സർട്ടിഫിക്കറ്റ് നമ്പർ</th>${H2.map((h,i)=>`<th rowspan="2">${h}<br>${12+i}</th>`).join('')}</tr><tr>${COURSES.map(c=>`<th>${c}</th>`).join('')}</tr>${rows}</table><p style="font-size:11px">സദർ മുഅല്ലിം: ........... മുഫത്തിഷ്: ...........</p>`;
   window._mr=tbl;
   $('#pg').innerHTML=`<div class="card"><b>${t.id?'തിരുത്തുക':'പുതിയ മുഅല്ലിമിനെ ചേർക്കുക'}</b>${f('m_n','പേരും ഇനീഷ്യലും, പൂർണ്ണ വിലാസം','text',esc(v('name')))}${f('m_f','പിതാവിൻ്റെ പേര്','text',esc(v('father')))}${f('m_d','ജനന തീയതി','date',v('dob'))}${f('m_b','രക്തഗ്രൂപ്പ്','text',esc(v('blood')))}${f('m_k','തിരിച്ചറിയാനുള്ള അടയാളം','text',esc(v('mark')))}${f('m_s','ശമ്പളം','number',v('salary'))}${f('m_m','MSR നമ്പർ','text',esc(v('msr')))}${f('m_j','മദ്രസയിലെ നിയമന തീയതി','date',v('joined'))}<div class="g">${f('m_r','വിദ്യാഭ്യാസ യോഗ്യത: മതപരം','text',esc(v('rel')))}${f('m_t','ഭൗതികം','text',esc(v('mat')))}</div><label>കോഴ്സ് സർട്ടിഫിക്കറ്റ് നമ്പർ (ഉള്ളത് മാത്രം)</label><div class="g">${COURSES.map((c,i)=>f('m_c'+i,c,'text',esc((t.cr||[])[i]||''))).join('')}</div>${f('m_x','സേവനം നിർത്തിയ തീയതി','date',v('stop'))}${f('m_l','CL അല്ലാത്ത മറ്റ് ലീവ്','text',esc(v('leaves')))}${f('m_w','വിടാനുള്ള കാരണം','text',esc(v('why')))}${f('m_e','റിമാർക്സ്','text',esc(v('rem')))}\n<label>ഒപ്പ് (വിരൽ കൊണ്ട് വരയ്ക്കുക)</label><canvas id="sgc" width="400" height="140" style="width:100%;border:1px solid var(--bd);border-radius:12px;background:#fff;touch-action:none"></canvas><button class="sm" onclick="clrSig()">ഒപ്പ് മായ്ക്കുക</button><p><button class="pri" onclick="saveM()">സേവ് ചെയ്യുക</button> ${t.id?'<button onclick="window._et=null;mreg()">റദ്ദാക്കുക</button>':''}</p></div>
 <h2>മുഅല്ലിമുകൾ</h2>${db.teachers.map(x=>`<div class="row"><span>${esc(x.name)}<br><span class="mu">സർവീസ്: ${svc(x)||'-'}</span></span><button class="sm" onclick="window._et='${x.id}';mreg();scrollTo(0,0)">തിരുത്തുക</button></div>`).join('')}
-${btns('_mr','muallim-register')}<div class="scroll card">${tbl.replace('style="width:100%;font-size:9px"','')}</div>`;
+${btns('_mr','muallim-register')}<div class="scroll card">${tbl}</div>`;
   initSig(t.sig);
 }
 function saveM(){
@@ -411,19 +592,22 @@ function sig(){
   const cell=(t,d,s)=>{
     if(sun(d))return'<td style="background:#ddd"></td>';
     const done=db.classes.some(c=>{const a=db.att[c.id+'|'+d];return c.sess==s&&a&&a.by==t.id&&!a.holiday});
-    return`<td style="font-size:8px">${done?(t.sig?'<img src="'+t.sig+'" style="height:18px;max-width:100%">':'<i>'+esc((t.name||'').slice(0,4))+'</i>'):''}</td>`;
+    if(!done)return'<td></td>';
+    const inner=t.sig?`<img src="${t.sig}" alt="">`:`<i>${esc((t.name||'').slice(0,4))}</i>`;
+    return`<td style="min-height:28px"><span class="sig-tilt">${inner}</span></td>`;
   };
   const rows=db.teachers.map((t,i)=>[1,2].map(s=>`<tr>${s==1?`<td rowspan="2">${i+1}</td><td rowspan="2" style="text-align:left">${esc(t.name)}</td>`:''}${days.map(d=>cell(t,d,s)).join('')}${s==1?`<td rowspan="2">${wCount}</td><td rowspan="2">${tPresentCount(t)}</td>`:''}</tr>`).join('')).join('');
   const summaryRows=db.teachers.map((t,i)=>`<tr><td>${i+1}</td><td style="text-align:left">${esc(t.name)}</td><td>${wCount}</td><td>${tPresentCount(t)}</td></tr>`).join('');
   const summaryBox=`<div style="margin-top:10px"><b style="font-size:11px">അധ്യാപകരുടെ പ്രവർത്തി ദിവസങ്ങളും ഹാജരായ ദിവസങ്ങളും (${lbl(ms,me)} – വർഷാരംഭം: ${esc(yrStartBound)})</b><table style="width:100%;margin-top:4px;font-size:9px"><tr><th>നമ്പർ</th><th>അധ്യാപകന്റെ പേര്</th><th>പ്രവർത്തി ദിവസം</th><th>ഹാജരായ ദിവസം</th></tr>${summaryRows}</table></div>`;
-  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>മുഅല്ലിം സിഗ്നേച്ചർ രജിസ്റ്റർ (MUALLIM SIGNATURE REGISTER)</b> – ${esc(db.madrasa||'')} (${esc(db.mno||'')}) – ${lbl(ms,me)} ${ms.slice(0,4)}</div><table style="width:100%"><colgroup><col style="width:4%"><col style="width:15%">${days.map(()=>'<col>').join('')}<col style="width:4.5%"><col style="width:4.5%"></colgroup><tr><th>നമ്പർ</th><th>പേര്</th>${days.map(d=>`<th>${+d.slice(8)}</th>`).join('')}<th>പ്ര.ദി</th><th>ഹാജർ</th></tr>${rows}</table>${summaryBox}<p style="font-size:11px">സദർ മുഅല്ലിം: ........... മുഫത്തീശ്: ...........</p>`;
+  const tbl=`<div style="text-align:center;margin-bottom:6px"><b style="font-size:14px">ISLAMIC EDUCATIONAL BOARD</b><br><b>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ്</b><br><b>മുഅല്ലിം സിഗ്നേച്ചർ രജിസ്റ്റർ (MUALLIM SIGNATURE REGISTER)</b> – ${esc(db.madrasa||'')} (${esc(db.mno||'')}) – ${lbl(ms,me)} ${ms.slice(0,4)}</div><table style="width:100%"><colgroup><col style="width:4%"><col style="width:14%">${days.map(()=>'<col>').join('')}<col style="width:4.5%"><col style="width:4.5%"></colgroup><tr><th>നമ്പർ</th><th>പേര്</th>${days.map(d=>`<th>${+d.slice(8)}</th>`).join('')}<th>പ്ര.ദി</th><th>ഹാജർ</th></tr>${rows}</table>${summaryBox}<p style="font-size:11px">സദർ മുഅല്ലിം: ........... മുഫത്തീശ്: ...........</p>`;
   window._sg=tbl;
-  $('#pg').innerHTML=`${rng('sig')}<p class="mu">ഓരോ ദിവസവും രണ്ട് വരി (സെക്ഷൻ 1, 2). അവസാന കോളങ്ങളിലും താഴത്തെ സംഗ്രഹത്തിലും പ്രവർത്തി ദിവസവും ഹാജരായ ദിവസവും കാണാം.</p>${btns('_sg','signature-register')}<div class="scroll card">${tbl}</div>`;
+  $('#pg').innerHTML=`${rng('sig')}<p class="mu">ഓരോ ദിവസവും രണ്ട് വരി (സെക്ഷൻ 1, 2) – ആകെ ${n} ദിവസം കാണാം. ഒപ്പുകൾ ചെരിച്ച് ക്രമീകരിച്ചിട്ടുണ്ട്.</p>${btns('_sg','signature-register')}<div class="scroll card">${tbl}</div>`;
 }
 
-/* ക്രമീകരണം */
+/* ക്രമീകരണം + ഘട്ടം 2 പഴയ ഹാജർ ഒതുക്കൽ */
 function set(){
   const sadarOpts='<option value="">-- തിരഞ്ഞെടുക്കുക --</option>'+db.teachers.map(t=>`<option value="${t.id}" ${t.id==db.sadarId?'selected':''}>${esc(t.name)}</option>`).join('');
+  const attTotal=Object.keys(db.att||{}).length;
   $('#pg').innerHTML=`<div class="card"><b>മദ്രസ & അധ്യായന വർഷം</b>
 ${f('m_name','മദ്രസയുടെ പേര്','text',esc(db.madrasa))}
 ${f('m_no','മദ്രസയുടെ രജിസ്റ്റർ / അംഗീകാര നമ്പർ','text',esc(db.mno||''))}
@@ -434,8 +618,35 @@ ${f('m_vs','വെക്കേഷൻ തുടങ്ങുന്ന തീയത
 <p><button class="pri" onclick="saveSettings()">സേവ്</button></p></div>
 <div class="card"><b>ക്ലാസുകൾ</b>${db.classes.map(c=>`<div class="row"><span>${esc(c.name)} · സെക്ഷൻ ${esc(c.sess)} · ${esc((db.teachers.find(t=>t.id==c.teacher)||{}).name||'-')}</span><button class="sm" onclick="delC('${c.id}')">നീക്കുക</button></div>`).join('')}
 ${f('c_name','പുതിയ ക്ലാസിൻ്റെ പേര്')}<div class="g"><label>സെക്ഷൻ<select id="c_s"><option>1</option><option>2</option></select></label><label>ക്ലാസ് അധ്യാപകൻ<select id="c_t">${opts(db.teachers)}</select></label></div><button onclick="addC()">ക്ലാസ് ചേർക്കുക</button></div>
+<div class="card"><b>പഴയ ഹാജർ ഒതുക്കൽ (Attendance Cleanup)</b>
+  <p class="mu">നിലവിലുള്ള ഹാജർ രേഖകൾ: <b>${attTotal}</b> എണ്ണം. തിരഞ്ഞെടുത്ത തീയതിക്ക് മുമ്പുള്ള പഴയ ഹാജർ ഡാറ്റ ഒതുക്കുന്നതിന് മുമ്പ് ഓട്ടോമാറ്റിക് ബാക്കപ്പ് എടുക്കും.</p>
+  ${f('trim_dt','ഈ തീയതിക്ക് മുമ്പുള്ള ഹാജർ നീക്കുക','date',sel.trimBefore||'')}
+  <p><button class="sm" onclick="trimOldAtt()">🧹 പഴയ ഹാജർ ഒതുക്കുക</button></p>
+</div>
 <div class="card"><b>ബാക്കപ്പ്</b><p><button class="pri" onclick="driveBk()">☁ Google Drive-ലേക്ക് ബാക്കപ്പ്</button></p><p><button onclick="bk()">ബാക്കപ്പ് ഫോണിലേക്ക് ഡൗൺലോഡ്</button></p><p><button class="sm" onclick="chPin()">അഡ്മിൻ PIN മാറ്റുക</button></p><p><button class="sm" style="background:#b3261e;color:#fff;border-color:#b3261e" onclick="clearAll()">🗑 ടെസ്റ്റ്: എല്ലാ ഡാറ്റയും മായ്ക്കുക</button></p><label>റീസ്റ്റോർ (ബാക്കപ്പ് ഫയൽ)<input type="file" accept=".json" onchange="rs(this.files[0])"></label></div>`;
 }
+
+async function trimOldAtt(){
+  const cut=val('trim_dt');
+  sel.trimBefore=cut;
+  if(!cut||!/^\d{4}-\d{2}-\d{2}$/.test(cut))return alert('കൃത്യമായ തീയതി തിരഞ്ഞെടുക്കുക');
+  if(!confirm(cut+' തീയതിക്ക് മുമ്പുള്ള ഹാജർ ഡാറ്റ ഒതുക്കട്ടെ? (മുമ്പ് ബാക്കപ്പ് എടുക്കും)'))return;
+  st('പഴയ ഹാജർ ഒതുക്കുന്നു…');
+  try{
+    const res=await api('trimAttBefore',{pin:PIN,beforeDate:cut});
+    Object.keys(db.att||{}).forEach(k=>{
+      const d=k.split('|')[1]||'';
+      if(d<cut)delete db.att[k];
+    });
+    st('✓ ഒതുക്കി: '+res.removed+' രേഖകൾ നീക്കി');
+    alert('പൂർത്തിയായി! നീക്കിയ രേഖകൾ: '+res.removed+', ബാക്കിയുള്ളവ: '+res.kept);
+    set();
+  }catch(e){
+    st('');
+    alert('പരാജയം: '+e.message);
+  }
+}
+
 function saveSettings(){
   const prevYs=db.yearStart||'';
   const newYs=val('m_ys');
@@ -448,7 +659,7 @@ function saveSettings(){
   db.yearStart=newYs;
   db.vacationStart=val('m_vs');
   db.sadarId=$('#m_sadar').value;
-  if(db.madrasa)$('#ttl').textContent=db.madrasa+' (Gemini Test)';
+  if(db.madrasa)$('#ttl').textContent=db.madrasa+' (Gemini Phase 2)';
   save();
   alert('സേവ് ചെയ്തു');
 }

@@ -138,36 +138,36 @@ const PH={l:'font-weight:600'};
 function pr(html){$('#print').innerHTML=html;window.print()}
 function reg(){
 const H=['ക്രമ നമ്പർ','പ്രവേശന നമ്പർ','പേര്, ഇനീഷ്യൽ','വീട്ടുപേര്','പിതാവ്/മാതാവ്','രക്ഷിതാവ്, ഫോൺ','ബന്ധം','ജോലി, മേൽവിലാസം','ജനന തീയതി','ചേർന്ന ക്ലാസ്','ചേർന്ന തീയതി','അടയാളം','മുമ്പ് പഠിച്ച മദ്രസ/TC','മുൻ നമ്പർ','വിട്ട ക്ലാസ്','വിട്ട തീയതി','വിടാനുള്ള കാരണം','ചേരുന്ന മദ്രസ','കൊടുത്ത TC','സദറിൻ്റെ ഒപ്പ്','റിമാർക്സ്'];
-const W=[3.2,3.8,6.8,5.5,6.2,6.8,3.8,7.5,4.5,4.3,4.5,4.8,5.5,3.5,4.2,4.5,5,4.8,3.5,3.8,3.5];
+const W=[3.2,3.8,6.3,5.3,5.9,6.4,3.8,6.8,5.3,4.3,5.3,4.8,5.2,3.5,4.2,5.3,5,4.8,3.5,3.8,3.5];
 const L=regList().sort((a,b)=>a.no-b.no),ssg=sigOf(db.sadar);
 const raw=L.map((s,ix)=>[ix+1,s.no,s.name,s.house,s.parent||'',(s.guardian||'')+(s.phone?'\nPh:'+s.phone:''),s.rel,s.job,D(s.dob),cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,D(s.joined),s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',D(s.left?.date||''),s.left?.reason||'',s.left?.to||'',s.left?.tc||'','',s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):''].map(x=>x==null?'':String(x)));
-/* ഓരോ വരിയുടെയും ഉയരം എഴുത്തിൻ്റെ നീളത്തിനനുസരിച്ച് തനിയെ കൂടും, എഴുത്ത് മുറിയില്ല */
-const CW=1056,LH=10.5,CH=6.4,CAND=[64,90,124,160,200,250,310,380,440];
-const fit=r=>{for(const h of CAND){const per=Math.max(1,Math.floor((h-10)/CH));let ok=true;for(let i=0;i<21&&ok;i++){if(i==19||!r[i])continue;const lines=r[i].split('\n').reduce((a,p)=>a+Math.max(1,Math.ceil(p.length*1.12/per)),0);if(lines>Math.floor((W[i]*CW/100-4)/LH))ok=false}if(ok)return h}return CAND[CAND.length-1]};
-const hts=raw.map(fit),PAGE=440,pages=[];let cur=[],used=0;
+/* പേജ് ഭാഗിക്കാൻ ഓരോ വരിയുടെയും ഉയരം ഏകദേശം കണക്കാക്കുന്നു (വരിയുടെ യഥാർത്ഥ ഉയരം എഴുത്തിനനുസരിച്ച് തനിയെ കൂടും) */
+const CW=1056,rowH=r=>{let m=1;for(let i=0;i<21;i++){if(i==19||!r[i])continue;const cpl=Math.max(1,Math.floor((W[i]*CW/100-4)/5.8));const ln=r[i].split('\n').reduce((a,p)=>a+Math.max(1,Math.ceil(p.length/cpl)),0);if(ln>m)m=ln}return Math.max(30,m*10.6+8)};
+const hts=raw.map(rowH),PAGE=470,pages=[];let cur=[],used=0;
 hts.forEach((h,i)=>{if(cur.length&&used+h>PAGE){pages.push(cur);cur=[];used=0}cur.push(i);used+=h});
 if(cur.length||!pages.length)pages.push(cur);
 const vStyle=`<style>
 .adm-register{width:1056px;margin:0 auto;background:#fff;color:#000;text-align:center;font-family:'Noto Sans Malayalam',Arial,sans-serif;box-sizing:border-box}
 .adm-heading{text-align:center;margin-bottom:8px;line-height:1.4;color:#000}
 .adm-v-tbl{width:1056px;border-collapse:collapse;table-layout:fixed;font-size:9px;color:#000;background:#fff}
-.adm-v-tbl th,.adm-v-tbl td{border:1px solid #111!important;padding:0;text-align:center;vertical-align:middle;box-sizing:border-box;overflow:hidden}
+.adm-v-tbl th,.adm-v-tbl td{border:1px solid #111!important;padding:0;text-align:center;vertical-align:middle;box-sizing:border-box}
 .adm-v-tbl th.adm-num-th{height:22px;font-size:9px;font-weight:bold;background:#e9edeb!important}
-.adm-v-tbl th.adm-rot-th{height:145px;background:#eef1f0!important}
+.adm-v-tbl th.adm-rot-th{height:145px;background:#eef1f0!important;overflow:hidden}
 .adm-rot-box{width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .adm-head-inner{display:inline-block;width:136px;flex-shrink:0;transform:rotate(-90deg);transform-origin:center center;font-size:9px;font-weight:bold;line-height:1.18;white-space:normal;word-break:break-word;text-align:center;color:#000}
-.adm-v-text{display:inline-block;flex-shrink:0;transform:rotate(-90deg);transform-origin:center center;font-size:8.5px;line-height:1.15;white-space:normal;overflow-wrap:anywhere;word-break:break-all;text-align:center;color:#000}
-.adm-sign{width:100%;display:flex;justify-content:center;align-items:center}
-.adm-sign img{max-height:50px;max-width:32px;object-fit:contain}
+.adm-v-tbl td.adm-d{padding:3px 2px;font-size:8.5px;line-height:1.25;white-space:normal;word-break:break-all;overflow-wrap:anywhere;color:#000}
+.adm-v-tbl td.adm-n{white-space:nowrap;word-break:normal;overflow-wrap:normal}
+.adm-v-tbl td.adm-s{padding:2px;height:30px}
+.adm-v-tbl td.adm-s img{max-height:28px;max-width:100%;object-fit:contain}
 .adm-v-tbl tr{break-inside:avoid;page-break-inside:avoid}
 @media print{@page{size:A4 landscape;margin:6mm}.adm-register,.adm-v-tbl{width:100%!important}.adm-v-tbl thead{display:table-header-group}}
 </style>`;
 const cg=`<colgroup>${W.map(w=>`<col style="width:${w}%">`).join('')}</colgroup>`;
 const thead=`<thead><tr>${H.map((_,i)=>`<th class="adm-num-th">${i+1}</th>`).join('')}</tr><tr>${H.map(h=>`<th class="adm-rot-th"><div class="adm-rot-box"><span class="adm-head-inner">${esc(h)}</span></div></th>`).join('')}</tr></thead>`;
-const body=pg=>pg.map(ix=>{const h=hts[ix],left=!!L[ix].left;return`<tr style="height:${h}px;${left?'opacity:.75;background:#f4f4f4':''}">${raw[ix].map((c,ci)=>ci==19?`<td><div class="adm-sign" style="height:${h-8}px">${ssg?`<img src="${ssg}" alt="">`:''}</div></td>`:`<td><div class="adm-rot-box"><span class="adm-v-text" style="width:${h-10}px">${esc(c).replace(/\n/g,'<br>')}</span></div></td>`).join('')}</tr>`}).join('');
+const body=pg=>pg.map(ix=>{const left=!!L[ix].left;return`<tr style="${left?'opacity:.75;background:#f4f4f4':''}">${raw[ix].map((c,ci)=>ci==19?`<td class="adm-s">${ssg?`<img src="${ssg}" alt="">`:''}</td>`:`<td class="adm-d${ci==8||ci==10||ci==15?' adm-n':''}">${esc(c).replace(/\n/g,'<br>')}</td>`).join('')}</tr>`}).join('');
 const tbl=vStyle+pages.map((pg,pi)=>`<div class="adm-register${pi<pages.length-1?' pgx tc-page-break':''}"${pi<pages.length-1?' style="page-break-after:always"':''}><div class="adm-heading"><b style="font-size:16px">ISLAMIC EDUCATIONAL BOARD OF INDIA</b><br><b style="font-size:15px">PUPILS' ADMISSION REGISTER</b><br>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ് വിദ്യാർത്ഥികളുടെ പ്രവേശന വിടുതൽ പട്ടിക<br>${db.madrasa?'മദ്രസ: '+esc(db.madrasa):''}${db.mno?' · '+esc(db.mno):''}${pages.length>1?' · പേജ് '+(pi+1)+'/'+pages.length:''}</div><table class="adm-v-tbl">${cg}${thead}<tbody>${body(pg)}</tbody></table></div>`).join('');
 window._reg=tbl;
-$('#pg').innerHTML=`<p class="mu">21 കള്ളികൾ: ക്രമ നമ്പർ + പുസ്തകത്തിലെ 20 കള്ളികൾ. എഴുത്ത് തിരിച്ചാണ് വെക്കുന്നത്; നീളം കൂടിയ എഴുത്തുള്ള വരി താഴേക്ക് ഉയരം കൂടും. ഓരോ പേജിലും തലക്കെട്ട് വരും.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl}</div>`}
+$('#pg').innerHTML=`<p class="mu">21 കള്ളികൾ: ക്രമ നമ്പർ + പുസ്തകത്തിലെ 20 കള്ളികൾ. തലക്കെട്ടുകൾ തിരിച്ചാണ്; വിവരങ്ങൾ കള്ളിക്കുള്ളിൽ മടങ്ങി എഴുതും, നീളം കൂടിയാൽ വരി താഴേക്ക് ഉയരം കൂടും. ഓരോ പേജിലും തലക്കെട്ട് വരും.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl}</div>`}
 function dim(m){const[y,mo]=m.split('-').map(Number);return new Date(y,mo,0).getDate()}
 function attp(){const c=sel.cls,ms=sel.from,me=sel.to,days=rangeDays(ms,me),n=days.length,m=ms.slice(0,7),y=ms.slice(0,4);if(!n||n>31||!c){$('#pg').innerHTML=rng('attp')+'<p class="warn">1–31 ദിവസത്തെ തീയതി പരിധി തിരഞ്ഞെടുക്കുക.</p>';return}
 const sun=d=>new Date(d+'T00:00').getDay()==0,rec=d=>db.att[c+'|'+d];

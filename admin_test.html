@@ -29,7 +29,7 @@ input,select,textarea{width:100%;box-sizing:border-box;padding:12px;border:1px s
 table{border-collapse:collapse;font-size:12px}th,td{border:1px solid #444;padding:3px 5px;text-align:center;vertical-align:top}
 #print{display:none}
 table.regt{width:100%;table-layout:fixed;border-collapse:collapse}table.regt th,table.regt td{border:1px solid #333;padding:2px 1px;text-align:center;vertical-align:middle;white-space:normal;word-break:break-word;overflow-wrap:anywhere;overflow:visible;line-height:1.25;height:auto}
-th.vh{position:relative;height:122px;padding:0!important;vertical-align:bottom}th.vh .vl{position:absolute;left:50%;top:52px;width:98px;margin-left:-49px;margin-top:-10px;height:20px;line-height:1.15;font-size:8.5px;text-align:center;-webkit-transform:rotate(-90deg);transform:rotate(-90deg);display:flex;align-items:center;justify-content:center}th.vh .vn{position:absolute;left:0;right:0;bottom:2px;font-size:8px;font-weight:600}
+
 @media print{#print table.regt{width:100%!important;table-layout:fixed!important}#print table.regt td,#print table.regt th{overflow:visible!important;word-break:break-word;overflow-wrap:anywhere;padding:2px 1px}}
 @media print{@page{size:A4 landscape;margin:6mm}html,body{padding:0!important;margin:0!important;max-width:none!important;background:#fff}body>*:not(#print){display:none!important}#print{display:block;color:#000;background:#fff;width:100%;box-sizing:border-box;padding:0 5mm;overflow:hidden}#print h3{margin:0 0 6px}#print table{width:100%!important;table-layout:fixed}#print td,#print th{overflow:hidden;word-break:break-word;padding:2px 1px}#print td[style*="nowrap"]{white-space:nowrap!important;text-overflow:ellipsis}#print table{font-size:9px}}
 </style></head><body>
@@ -136,13 +136,38 @@ s.left={date:d,cls:cls(s.classId).name,reason:r,how,tc:'',to:''};save();h=='1'?(
 /* പ്രിൻ്റ് */
 const PH={l:'font-weight:600'};
 function pr(html){$('#print').innerHTML=html;window.print()}
-function reg(){const H=['ക്രമ നമ്പർ','പ്രവേശന നമ്പർ','പേര്, ഇനീഷ്യൽ','വീട്ടുപേര്','പിതാവ്/മാതാവ്','രക്ഷിതാവ്, ഫോൺ','ബന്ധം','ജോലി, മേൽവിലാസം','ജനന തീയതി','ചേർന്ന ക്ലാസ്','ചേർന്ന തീയതി','അടയാളം','മുമ്പ് പഠിച്ച മദ്രസ/TC','മുൻ നമ്പർ','വിട്ട ക്ലാസ്','വിട്ട തീയതി','വിടാനുള്ള കാരണം','ചേരുന്ന മദ്രസ','കൊടുത്ത TC','സദറിൻ്റെ ഒപ്പ്','റിമാർക്സ്'];
-const L=regList().sort((a,b)=>a.no-b.no);const ssg=sigOf(db.sadar),sgc=ssg?`<img src="${ssg}" style="height:22px;max-width:60px">`:'';const rows=L.map((s,ix)=>[ix+1,s.no,s.name,s.house,s.parent||'',(s.guardian||'')+' '+(s.phone||''),s.rel,s.job,D(s.dob),cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,D(s.joined),s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',D(s.left?.date||''),s.left?.reason||'',s.left?.to||'',s.left?.tc||'',sgc,s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):'']);
-const CG='<colgroup>'+[3.2,4.6,6.5,5,5.5,6.4,4,6.5,5,4.5,5,4.5,5.5,3,4,5,5,5,3.5,4,4.3].map(w=>'<col style="width:'+w+'%">').join('')+'</colgroup>';
-const PG=12,pages=[];for(let i=0;i<Math.max(rows.length,1);i+=PG)pages.push(i);
-const th=`<tr>${H.map((h,i)=>`<th class="vh"><div class="vl"><span>${h}</span></div><div class="vn">${i||''}</div></th>`).join('')}</tr>`;
-const tbl=pages.map((i,pi)=>`<div${pi<pages.length-1?' class="pgx" style="page-break-after:always"':''}>${bh("ISLAMIC EDUCATIONAL BOARD OF INDIA","PUPILS' ADMISSION REGISTER","സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ് വിദ്യാർത്ഥികളുടെ പ്രവേശന വിടുതൽ പട്ടിക")}<p style="text-align:center;margin:2px 0 6px">${db.madrasa?'മദ്രസ: '+db.madrasa:''}${db.mno?' · '+db.mno:''}${pages.length>1?' · പേജ് '+(pi+1)+'/'+pages.length:''}</p><table class="regt" style="font-size:9px">${CG}${th}${rows.slice(i,i+PG).map((r,ri)=>`<tr style="height:34px;${L[i+ri]&&L[i+ri].left?'opacity:.5;background:#eee':''}">${r.map((c,ci)=>`<td>${ci==19?c:esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`).join('');
-window._reg=tbl;$('#pg').innerHTML=`<p class="mu">21 കള്ളികൾ: ക്രമ നമ്പർ + പുസ്തകത്തിലെ 20 കള്ളികൾ (1–20). ഓരോ പേജിലും തലക്കെട്ട് വരും (12 കുട്ടികൾ വീതം).</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl.split('class="regt" style="font-size:9px"').join('class="regt" style="font-size:9px;min-width:1000px"')}</div>`}
+function reg(){
+const H=['ക്രമ നമ്പർ','പ്രവേശന നമ്പർ','പേര്, ഇനീഷ്യൽ','വീട്ടുപേര്','പിതാവ്/മാതാവ്','രക്ഷിതാവ്, ഫോൺ','ബന്ധം','ജോലി, മേൽവിലാസം','ജനന തീയതി','ചേർന്ന ക്ലാസ്','ചേർന്ന തീയതി','അടയാളം','മുമ്പ് പഠിച്ച മദ്രസ/TC','മുൻ നമ്പർ','വിട്ട ക്ലാസ്','വിട്ട തീയതി','വിടാനുള്ള കാരണം','ചേരുന്ന മദ്രസ','കൊടുത്ത TC','സദറിൻ്റെ ഒപ്പ്','റിമാർക്സ്'];
+const W=[3.2,3.8,6.8,5.5,6.2,6.8,3.8,7.5,4.5,4.3,4.5,4.8,5.5,3.5,4.2,4.5,5,4.8,3.5,3.8,3.5];
+const L=regList().sort((a,b)=>a.no-b.no),ssg=sigOf(db.sadar);
+const raw=L.map((s,ix)=>[ix+1,s.no,s.name,s.house,s.parent||'',(s.guardian||'')+(s.phone?'\nPh:'+s.phone:''),s.rel,s.job,D(s.dob),cls((s.hist&&s.hist[0]||{c:s.classId}).c).name,D(s.joined),s.mark,s.prev||'',s.prevNo||'',s.left?.cls||'',D(s.left?.date||''),s.left?.reason||'',s.left?.to||'',s.left?.tc||'','',s.left?(s.left.how||'വിടുതൽ ചെയ്തു'):''].map(x=>x==null?'':String(x)));
+/* ഓരോ വരിയുടെയും ഉയരം എഴുത്തിൻ്റെ നീളത്തിനനുസരിച്ച് തനിയെ കൂടും, എഴുത്ത് മുറിയില്ല */
+const CW=1056,LH=10.5,CH=6.4,CAND=[64,90,124,160,200,250,310,380,440];
+const fit=r=>{for(const h of CAND){const per=Math.max(1,Math.floor((h-10)/CH));let ok=true;for(let i=0;i<21&&ok;i++){if(i==19||!r[i])continue;const lines=r[i].split('\n').reduce((a,p)=>a+Math.max(1,Math.ceil(p.length*1.12/per)),0);if(lines>Math.floor((W[i]*CW/100-4)/LH))ok=false}if(ok)return h}return CAND[CAND.length-1]};
+const hts=raw.map(fit),PAGE=440,pages=[];let cur=[],used=0;
+hts.forEach((h,i)=>{if(cur.length&&used+h>PAGE){pages.push(cur);cur=[];used=0}cur.push(i);used+=h});
+if(cur.length||!pages.length)pages.push(cur);
+const vStyle=`<style>
+.adm-register{width:1056px;margin:0 auto;background:#fff;color:#000;text-align:center;font-family:'Noto Sans Malayalam',Arial,sans-serif;box-sizing:border-box}
+.adm-heading{text-align:center;margin-bottom:8px;line-height:1.4;color:#000}
+.adm-v-tbl{width:1056px;border-collapse:collapse;table-layout:fixed;font-size:9px;color:#000;background:#fff}
+.adm-v-tbl th,.adm-v-tbl td{border:1px solid #111!important;padding:0;text-align:center;vertical-align:middle;box-sizing:border-box;overflow:hidden}
+.adm-v-tbl th.adm-num-th{height:22px;font-size:9px;font-weight:bold;background:#e9edeb!important}
+.adm-v-tbl th.adm-rot-th{height:145px;background:#eef1f0!important}
+.adm-rot-box{width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.adm-head-inner{display:inline-block;width:136px;flex-shrink:0;transform:rotate(-90deg);transform-origin:center center;font-size:9px;font-weight:bold;line-height:1.18;white-space:normal;word-break:break-word;text-align:center;color:#000}
+.adm-v-text{display:inline-block;flex-shrink:0;transform:rotate(-90deg);transform-origin:center center;font-size:8.5px;line-height:1.15;white-space:normal;overflow-wrap:anywhere;word-break:break-all;text-align:center;color:#000}
+.adm-sign{width:100%;display:flex;justify-content:center;align-items:center}
+.adm-sign img{max-height:50px;max-width:32px;object-fit:contain}
+.adm-v-tbl tr{break-inside:avoid;page-break-inside:avoid}
+@media print{@page{size:A4 landscape;margin:6mm}.adm-register,.adm-v-tbl{width:100%!important}.adm-v-tbl thead{display:table-header-group}}
+</style>`;
+const cg=`<colgroup>${W.map(w=>`<col style="width:${w}%">`).join('')}</colgroup>`;
+const thead=`<thead><tr>${H.map((_,i)=>`<th class="adm-num-th">${i+1}</th>`).join('')}</tr><tr>${H.map(h=>`<th class="adm-rot-th"><div class="adm-rot-box"><span class="adm-head-inner">${esc(h)}</span></div></th>`).join('')}</tr></thead>`;
+const body=pg=>pg.map(ix=>{const h=hts[ix],left=!!L[ix].left;return`<tr style="height:${h}px;${left?'opacity:.75;background:#f4f4f4':''}">${raw[ix].map((c,ci)=>ci==19?`<td><div class="adm-sign" style="height:${h-8}px">${ssg?`<img src="${ssg}" alt="">`:''}</div></td>`:`<td><div class="adm-rot-box"><span class="adm-v-text" style="width:${h-10}px">${esc(c).replace(/\n/g,'<br>')}</span></div></td>`).join('')}</tr>`}).join('');
+const tbl=vStyle+pages.map((pg,pi)=>`<div class="adm-register${pi<pages.length-1?' pgx tc-page-break':''}"${pi<pages.length-1?' style="page-break-after:always"':''}><div class="adm-heading"><b style="font-size:16px">ISLAMIC EDUCATIONAL BOARD OF INDIA</b><br><b style="font-size:15px">PUPILS' ADMISSION REGISTER</b><br>സമസ്ത കേരള സുന്നി വിദ്യാഭ്യാസ ബോർഡ് വിദ്യാർത്ഥികളുടെ പ്രവേശന വിടുതൽ പട്ടിക<br>${db.madrasa?'മദ്രസ: '+esc(db.madrasa):''}${db.mno?' · '+esc(db.mno):''}${pages.length>1?' · പേജ് '+(pi+1)+'/'+pages.length:''}</div><table class="adm-v-tbl">${cg}${thead}<tbody>${body(pg)}</tbody></table></div>`).join('');
+window._reg=tbl;
+$('#pg').innerHTML=`<p class="mu">21 കള്ളികൾ: ക്രമ നമ്പർ + പുസ്തകത്തിലെ 20 കള്ളികൾ. എഴുത്ത് തിരിച്ചാണ് വെക്കുന്നത്; നീളം കൂടിയ എഴുത്തുള്ള വരി താഴേക്ക് ഉയരം കൂടും. ഓരോ പേജിലും തലക്കെട്ട് വരും.</p>${regF()}${btns('_reg','admission-register')}<div class="scroll card">${tbl}</div>`}
 function dim(m){const[y,mo]=m.split('-').map(Number);return new Date(y,mo,0).getDate()}
 function attp(){const c=sel.cls,ms=sel.from,me=sel.to,days=rangeDays(ms,me),n=days.length,m=ms.slice(0,7),y=ms.slice(0,4);if(!n||n>31||!c){$('#pg').innerHTML=rng('attp')+'<p class="warn">1–31 ദിവസത്തെ തീയതി പരിധി തിരഞ്ഞെടുക്കുക.</p>';return}
 const sun=d=>new Date(d+'T00:00').getDay()==0,rec=d=>db.att[c+'|'+d];
